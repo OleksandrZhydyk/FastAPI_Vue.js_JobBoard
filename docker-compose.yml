@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  backend:
+    build: ./
+    container_name: fastApiProject
+    command:
+      - ./commands/start_server.sh
+    ports:
+      - ${LOCAL_PORT}:${WSGI_PORT}
+    volumes:
+      - ./src:/fastapi/src
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:12
+    container_name: postgres
+    ports:
+      - 5434:5432
+    env_file:
+      - .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  pg_admin:
+    image: dpage/pgadmin4
+    container_name: pg_admin
+    ports:
+      - 5000:80
+    env_file:
+      - .env
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+
+volumes:
+  pg_data: { }
+  pgadmin_data: { }
+
