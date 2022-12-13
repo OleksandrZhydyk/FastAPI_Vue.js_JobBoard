@@ -11,6 +11,8 @@ databases = {extras = ["postgresql"], version = "*"}
 psycopg2-binary = "*"
 users = "*"
 passlib = "*"
+pydantic = {extras = ["email"], version = "*"}
+bcrypt = "*"
 
 [dev-packages]
 
