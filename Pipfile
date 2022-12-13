@@ -10,6 +10,7 @@ sqlalchemy = "*"
 databases = {extras = ["postgresql"], version = "*"}
 psycopg2-binary = "*"
 users = "*"
+passlib = "*"
 
 [dev-packages]
 
