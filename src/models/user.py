@@ -1,6 +1,6 @@
-import datetime
+from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr, validator, constr
+from pydantic import BaseModel, EmailStr, validator, constr, Field
 
 
 class UserBase(BaseModel):
@@ -12,16 +12,16 @@ class UserBase(BaseModel):
 class User(UserBase):
     id: Optional[str]
     hashed_password: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
 
 class UserCreate(UserBase):
     password: constr(min_length=8)
     confirmed_password: str
 
-    # @validator("confirmed_password")
-    # def match_passwords(cls, value, fields, **kwargs):
-    #     if "password" in fields and fields["password"] != value:
-    #         raise ValueError("Wrong password")
-    #     return value
+    @validator("confirmed_password")
+    def match_passwords(cls, password, values, **kwargs):
+        if "password" in values and values["password"] != password:
+            raise ValueError("Wrong password")
+        return password
