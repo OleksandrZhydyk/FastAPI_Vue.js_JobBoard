@@ -1,12 +1,10 @@
-from typing import List
-
 from fastapi import APIRouter
 
-from models.user import User
+from src.models.user import User
 
-router = APIRouter
+router = APIRouter()
 
 
-@router.get("/", response_model=List[User])
+@router.get("/", response_model=list[User])
 async def read_users(limit: int = 100, skip: int = 100):
     return {}

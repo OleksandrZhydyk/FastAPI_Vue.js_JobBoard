@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
-from endpoints.users import router
+from src.endpoints.users import router
 from src.db.base import database
 
-app = FastAPI("Employment exchange")
+app = FastAPI(title="Employment exchange")
 app.include_router(router, prefix="/users", tags=["users"])
 
 
