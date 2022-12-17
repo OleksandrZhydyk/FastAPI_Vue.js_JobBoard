@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 from endpoints.users import router
-from src.db.base import database
+from db.base import database
 
-app = FastAPI("Employment exchange")
+app = FastAPI()
 app.include_router(router, prefix="/users", tags=["users"])
 
 
@@ -17,5 +17,5 @@ async def shutdown():
     await database.disconnect()
 
 
-if __name__ == "__main__":
-    uvicorn.run()
+# if __name__ == "__main__":
+#     uvicorn.run()

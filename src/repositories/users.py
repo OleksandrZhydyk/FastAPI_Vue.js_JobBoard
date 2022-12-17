@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from core.security import hash_password
 from db.users import users
-from models.user import User, UserIn
+from models.user import User, UserCreate
 from .base import BaseRepository
 
 
@@ -20,7 +20,7 @@ class UserRepository(BaseRepository):
             return None
         return User.parse_obj(user)
 
-    async def create(self, u: UserIn) -> User:
+    async def create(self, u: UserCreate) -> User:
         user = User(
             name=u.name,
             email=u.email,
@@ -35,7 +35,7 @@ class UserRepository(BaseRepository):
         user.id = await self.database.execute(query)
         return user
 
-    async def update(self, id: int, u: UserIn) -> User:
+    async def update(self, id: int, u: UserCreate) -> User:
         user = User(
             name=u.name,
             email=u.email,

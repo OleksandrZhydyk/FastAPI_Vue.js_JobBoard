@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from models.user import User
 
-router = APIRouter
+router = APIRouter()
 
 
 @router.get("/", response_model=List[User])

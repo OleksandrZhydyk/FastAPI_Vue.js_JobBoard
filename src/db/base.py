@@ -1,7 +1,7 @@
 import databases
 import sqlalchemy
 
-from src.core.config import DATABASE_URL
+from core.config import DATABASE_URL
 
 database = databases.Database(DATABASE_URL)
 

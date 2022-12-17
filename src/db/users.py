@@ -2,7 +2,7 @@ import datetime
 
 import sqlalchemy
 
-from src.db.base import metadata
+from db.base import metadata
 
 users = sqlalchemy.Table(
     "users",

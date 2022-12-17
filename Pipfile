@@ -13,6 +13,7 @@ users = "*"
 passlib = "*"
 pydantic = {extras = ["email"], version = "*"}
 bcrypt = "*"
+alembic = "*"
 
 [dev-packages]
 
