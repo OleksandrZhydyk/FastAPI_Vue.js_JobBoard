@@ -14,6 +14,8 @@ passlib = "*"
 pydantic = {extras = ["email"], version = "*"}
 bcrypt = "*"
 alembic = "*"
+asyncpg = "*"
+config = "*"
 
 [dev-packages]
 

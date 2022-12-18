@@ -1,18 +1,17 @@
-import datetime
+from datetime import datetime
 
-import sqlalchemy
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 
-from db.base import metadata
+from src.db.base import Base
 
-users = sqlalchemy.Table(
-    "users",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True),
-    sqlalchemy.Column("email", sqlalchemy.String, primary_key=True, unique=True),
-    sqlalchemy.Column("name", sqlalchemy.String,),
-    sqlalchemy.Column("hashed_password", sqlalchemy.String),
-    sqlalchemy.Column("is_company", sqlalchemy.Boolean),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow()),
-    sqlalchemy.Column("updated_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow()),
-)
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
+    email = Column(String)
+    name = Column(String)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default="False")
+    is_company = Column(Boolean, default="False")
+    created_at = Column(DateTime, index=True, default=datetime.utcnow())
+    updated_at = Column(DateTime, index=True, default=datetime.utcnow())

@@ -1,20 +1,19 @@
 import datetime
 
-import sqlalchemy
+from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Boolean, Text
 
-from db.base import metadata
+from src.db.base import Base
 
-jobs = sqlalchemy.Table(
-    "jobs",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True, index=True),
-    sqlalchemy.Column("user_id", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id')),
-    sqlalchemy.Column("email", sqlalchemy.String, primary_key=True, unique=True),
-    sqlalchemy.Column("title", sqlalchemy.String,),
-    sqlalchemy.Column("description", sqlalchemy.String),
-    sqlalchemy.Column("is_active", sqlalchemy.Boolean, default="False"),
-    sqlalchemy.Column("salary_from", sqlalchemy.Integer),
-    sqlalchemy.Column("salary_to", sqlalchemy.Integer),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow()),
-    sqlalchemy.Column("updated_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow()),
-)
+
+class Job(Base):
+    __tablename__ = "jobs"
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
+    email = Column(String)
+    user_id = Column(ForeignKey('users.id'), nullable=True)
+    title = Column(String, index=True)
+    description = Column(Text)
+    is_active = Column(Boolean, default="False")
+    created_at = Column(DateTime, index=True, default=datetime.utcnow)
+    updated_at = Column(DateTime, index=True, default=datetime.utcnow)
+    salary_from = Column(Integer)
+    salary_to = Column(Integer)
