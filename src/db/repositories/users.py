@@ -2,8 +2,8 @@ import datetime
 from typing import List, Optional
 
 from src.core.security import hash_password
-from src.db.users import users
-from src.models.user import User, UserCreate
+from db.models.users import users
+from models import User, UserCreate
 from .base import BaseRepository
 
 
