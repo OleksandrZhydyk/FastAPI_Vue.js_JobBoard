@@ -19,7 +19,7 @@ class User(Base):
 
     @classmethod
     async def create(cls, **kwargs):
-        user = cls(id=int, **kwargs)
+        user = cls(**kwargs)
         db.add(user)
         try:
             await db.commit()
@@ -27,3 +27,4 @@ class User(Base):
             await db.rollback()
             raise
         return user
+

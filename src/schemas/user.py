@@ -7,13 +7,25 @@ class UserBase(BaseModel):
     email: EmailStr
     name: str
     is_company: bool
+    is_active: bool
 
 
-class User(UserBase):
-    id: Optional[str]
+class UserIn(UserBase):
+    id: int
     hashed_password: str
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
+    created_at: Optional[datetime] = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = Field(default_factory=datetime.now)
+
+    class Config:
+        orm_mode = True
+
+
+class UserOut(UserBase):
+    created_at: Optional[datetime] = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = Field(default_factory=datetime.now)
+
+    class Config:
+        orm_mode = True
 
 
 class UserCreate(UserBase):
@@ -25,3 +37,6 @@ class UserCreate(UserBase):
         if "password" in values and values["password"] != password:
             raise ValueError("Wrong password")
         return password
+
+    class Config:
+        orm_mode = True
