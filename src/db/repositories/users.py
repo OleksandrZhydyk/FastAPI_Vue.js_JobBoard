@@ -1,7 +1,11 @@
+from datetime import datetime
+from sqlalchemy import update
+from starlette.exceptions import HTTPException
+
 from src.core.security import hash_password
 from src.db.base import db
 from src.db.repositories.base import BaseService
-from src.schemas.user import UserIn, UserCreate, UserOut
+from src.schemas.user import UserIn, UserCreate, UserOut, UserBase
 from src.db.models.users import User
 
 
@@ -11,7 +15,7 @@ class UsersService(BaseService[UserOut, UserCreate]):
 
     async def create(self, obj: UserCreate) -> UserIn:
         obj_dict = obj.dict()
-        hashed_password = hash_password(obj_dict['password'])
+        hashed_password = hash_password(obj_dict.get('password'))
         db_obj = self.model(
             email=obj_dict.get('email'),
             name=obj_dict.get('name'),
@@ -24,8 +28,24 @@ class UsersService(BaseService[UserOut, UserCreate]):
             await db.commit()
         except Exception:
             await db.rollback()
-            raise
+            raise HTTPException(status_code=409, detail="This email is already registered")
         return db_obj
+
+    async def update(self, pk: int, obj: UserIn) -> UserOut:
+        obj_dict = obj.dict()
+
+        obj_dict['updated_at'] = datetime.utcnow().isoformat()[:-3]+'Z'
+        print(obj_dict)
+        query = update(self.model).where(self.model.id == pk)\
+            .values(**obj_dict)\
+            .execution_options(synchronize_session="fetch")
+        await db.execute(query)
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise
+        return obj_dict
 
 
 def get_users_service() -> UsersService:

@@ -1,8 +1,8 @@
-"""init2
+"""init
 
-Revision ID: c06f605d080f
-Revises: 4e01821d77d2
-Create Date: 2022-12-20 23:15:36.047398
+Revision ID: bd21b34b90a7
+Revises: 
+Create Date: 2022-12-24 11:29:16.507899
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c06f605d080f'
-down_revision = '4e01821d77d2'
+revision = 'bd21b34b90a7'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -25,13 +25,12 @@ def upgrade() -> None:
     sa.Column('hashed_password', sa.String(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('is_company', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.String(), nullable=True),
+    sa.Column('created_at', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_users_created_at'), 'users', ['created_at'], unique=False)
+    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=True)
-    op.create_index(op.f('ix_users_updated_at'), 'users', ['updated_at'], unique=False)
     op.create_table('jobs',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('email', sa.String(), nullable=True),
@@ -44,7 +43,8 @@ def upgrade() -> None:
     sa.Column('salary_from', sa.Integer(), nullable=True),
     sa.Column('salary_to', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_index(op.f('ix_jobs_created_at'), 'jobs', ['created_at'], unique=False)
     op.create_index(op.f('ix_jobs_id'), 'jobs', ['id'], unique=True)
@@ -60,8 +60,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_jobs_id'), table_name='jobs')
     op.drop_index(op.f('ix_jobs_created_at'), table_name='jobs')
     op.drop_table('jobs')
-    op.drop_index(op.f('ix_users_updated_at'), table_name='users')
     op.drop_index(op.f('ix_users_id'), table_name='users')
-    op.drop_index(op.f('ix_users_created_at'), table_name='users')
+    op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
     # ### end Alembic commands ###
