@@ -1,4 +1,5 @@
-from typing import Generic, List, Optional, Type, TypeVar
+from fastapi import status
+from typing import Generic, List, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import update, delete
@@ -26,7 +27,7 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
             await db.commit()
         except Exception:
             await db.rollback()
-            raise
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect value was entered")
         return instance
 
     async def get_all(self) -> List[ModelType]:
@@ -34,7 +35,7 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
         db_obj: List[ModelType] = await db.execute(query)
         instances = db_obj.scalars().all()
         if not instances:
-            raise HTTPException(status_code=404, detail="There are no users")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects")
         return instances
 
     async def get_one(self, pk: int) -> ModelType:
@@ -42,7 +43,7 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
         db_obj = await db.execute(query)
         instance = db_obj.scalar()
         if not instance:
-            raise HTTPException(status_code=404, detail="There is no user")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object")
         return instance
 
     async def update(self, pk: int, obj: ModelType) -> ModelType:
@@ -52,7 +53,7 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
             await db.commit()
         except Exception:
             await db.rollback()
-            raise
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect value was entered")
         return obj.dict()
 
     async def delete(self, pk: int):
@@ -62,6 +63,6 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
             await db.commit()
         except Exception:
             await db.rollback()
-            raise
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object to delete")
         return True
 

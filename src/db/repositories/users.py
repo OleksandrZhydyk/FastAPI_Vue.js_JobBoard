@@ -1,11 +1,12 @@
 from datetime import datetime
+from fastapi import status, Depends
 from sqlalchemy import update
-from starlette.exceptions import HTTPException
+from fastapi import HTTPException
 
 from src.core.security import hash_password
 from src.db.base import db
 from src.db.repositories.base import BaseService
-from src.schemas.user import UserIn, UserCreate, UserOut, UserBase
+from src.schemas.user import UserCreate, UserOut, UserBase, UserUpdate
 from src.db.models.users import User
 
 
@@ -13,7 +14,7 @@ class UsersService(BaseService[UserOut, UserCreate]):
     def __init__(self):
         super().__init__(User)
 
-    async def create(self, obj: UserCreate) -> UserIn:
+    async def create(self, obj: UserCreate) -> UserOut:
         obj_dict = obj.dict()
         hashed_password = hash_password(obj_dict.get('password'))
         db_obj = self.model(
@@ -28,14 +29,13 @@ class UsersService(BaseService[UserOut, UserCreate]):
             await db.commit()
         except Exception:
             await db.rollback()
-            raise HTTPException(status_code=409, detail="This email is already registered")
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
         return db_obj
 
-    async def update(self, pk: int, obj: UserIn) -> UserOut:
+    async def update(self, pk: int, obj: UserOut) -> UserUpdate:
         obj_dict = obj.dict()
-
-        obj_dict['updated_at'] = datetime.utcnow().isoformat()[:-3]+'Z'
-        print(obj_dict)
+        obj_dict['updated_at'] = datetime.utcnow()
+        del obj_dict['created_at']
         query = update(self.model).where(self.model.id == pk)\
             .values(**obj_dict)\
             .execution_options(synchronize_session="fetch")

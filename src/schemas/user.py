@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, EmailStr, validator, constr, Field
+from pydantic import BaseModel, EmailStr, validator, constr
 
 
 class UserBase(BaseModel):
@@ -10,23 +9,25 @@ class UserBase(BaseModel):
     is_company: bool
 
 
-class UserIn(UserBase):
-    id: int
-    hashed_password: str
-    is_active: bool
-    created_at: str
-    updated_at: str
-
-    class Config:
-        orm_mode = True
-
-
 class UserOut(UserBase):
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True
+        json_encoders = {
+            datetime: lambda date: str(date)[:-3] + 'Z'
+        }
+
+
+class UserUpdate(UserBase):
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+        json_encoders = {
+            datetime: lambda date: str(date)[:-3] + 'Z'
+        }
 
 
 class UserCreate(UserBase):
@@ -41,3 +42,7 @@ class UserCreate(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class UserInDB(UserBase):
+    hashed_password: str

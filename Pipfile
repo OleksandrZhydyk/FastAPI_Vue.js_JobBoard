@@ -8,7 +8,6 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 databases = {extras = ["postgresql"], version = "*"}
-psycopg2-binary = "*"
 users = "*"
 passlib = "*"
 pydantic = {extras = ["email"], version = "*"}
@@ -16,6 +15,8 @@ bcrypt = "*"
 alembic = "*"
 asyncpg = "*"
 config = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+python-multipart = "*"
 
 [dev-packages]
 
