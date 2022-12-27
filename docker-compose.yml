@@ -9,7 +9,7 @@ services:
     ports:
       - ${LOCAL_PORT}:${WSGI_PORT}
     volumes:
-      - ./src:/fastapi/src
+      - ./:/fastApiProject
     env_file:
       - .env
     depends_on:
