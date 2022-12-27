@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
-from src.endpoints.users import router
+from src.endpoints.jobs import router_jobs
+from src.endpoints.users import router_users
 from src.db.base import db
 
 
@@ -24,7 +25,8 @@ def init_app():
 
 app = init_app()
 
-app.include_router(router, prefix="/users", tags=["users"])
+app.include_router(router_users, prefix="/users", tags=["users"])
+app.include_router(router_jobs, prefix="/jobs", tags=["jobs"])
 
 # @app.on_event("startup")
 # async def startup():

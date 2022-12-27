@@ -1,16 +1,74 @@
-import datetime
-from typing import List, Optional
+from datetime import datetime
+from fastapi import status, Depends
+from sqlalchemy import update
+from fastapi import HTTPException
 
-from schemas.user import UserCreate
-from db.models.users import User
-from .base import BaseRepository
+from src.core.security import hash_password
+from src.db.base import db
+from src.db.repositories.base import BaseService
+from src.schemas.user import UserCreate, UserOut, UserBase, UserUpdate
+from src.db.models.users import User
 
 
-class UserRepository(BaseRepository):
+class UsersService(BaseService[UserOut, UserCreate]):
+    def __init__(self):
+        super().__init__(User)
 
-    async def create(user: UserCreate):
-        user = await User.create(**user.dict())
-        return user
+    async def create(self, obj: UserCreate) -> UserOut:
+        obj_dict = obj.dict()
+        hashed_password = hash_password(obj_dict.get('password'))
+        db_obj = self.model(
+            email=obj_dict.get('email'),
+            name=obj_dict.get('name'),
+            is_company=obj_dict.get('is_company'),
+            is_active=obj_dict.get('is_active'),
+            hashed_password=hashed_password
+        )
+        db.add(db_obj)
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
+        return db_obj
+
+    async def update(self, pk: int, obj: UserOut) -> UserUpdate:
+        obj_dict = obj.dict()
+        obj_dict['updated_at'] = datetime.utcnow()
+        del obj_dict['created_at']
+        query = update(self.model).where(self.model.id == pk)\
+            .values(**obj_dict)\
+            .execution_options(synchronize_session="fetch")
+        await db.execute(query)
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise
+        return obj_dict
+
+
+def get_users_service() -> UsersService:
+    return UsersService()
+
+
+
+
+# import datetime
+# from typing import List, Optional
+
+# from schemas.user import UserCreate
+# from db.models.users import User
+# from .base import BaseRepository
+#
+#
+# class UserRepository(BaseRepository):
+#
+#     async def create_user(user: UserCreate):
+#         user = await User.create(**user.dict())
+#         return user
+
+
 
     # async def get_user(id: str):
     #     user = await User.get(id)
