@@ -1,10 +1,13 @@
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, Security
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import jwt, JWTError
+from pydantic import ValidationError
 from sqlalchemy.future import select
 from starlette import status
+from starlette.status import HTTP_401_UNAUTHORIZED
 
-from src.schemas.user import UserInDB
+from src.schemas.job import JobOut
+from src.schemas.user import UserInDB, UserOut
 from src.schemas.token import TokenRead
 from src.db.models.users import User
 
@@ -16,7 +19,11 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth",
+                                     scheme_name="JWT",
+                                     scopes={"auth": "Access all info about current user",
+                                             "company": "Access to create jobs",
+                                             "superuser": "Access all info and actions",})
 
 
 def hash_password(password: str) -> str:
@@ -27,9 +34,9 @@ def verify_password(password: str, hashed_password: str) -> bool:
     return pwd_context.verify(password, hashed_password)
 
 
-async def get_user(db, email: str) -> UserInDB:
+async def get_user(database, email: str) -> UserInDB:
     query = select(User).where(User.email == email)
-    db_obj = await db.execute(query)
+    db_obj = await database.execute(query)
     instance = db_obj.scalar()
     return instance
 
@@ -51,21 +58,61 @@ def create_access_token(data: dict) -> str:
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+def create_refresh_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=Config.REFRESH_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, Config.JWT_REFRESH_SECRET_KEY, algorithm=Config.ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)):
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = "Bearer"
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+        headers={"WWW-Authenticate": 'authenticate_value'},
     )
     try:
         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
-        token_data = TokenRead(email=email)
-    except JWTError:
+        token_scopes = payload.get("scopes", [])
+        token_data = TokenRead(scopes=token_scopes, email=email)
+    except (JWTError, ValidationError):
         raise credentials_exception
-    user = get_user(db, email=token_data.email)
+    user = await get_user(db, email=token_data.email)
     if user is None:
         raise credentials_exception
+    for scope in security_scopes.scopes:
+        if scope not in token_data.scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )
     return user
+
+
+async def get_current_active_user(
+    current_user: UserOut = Security(get_current_user, scopes=["auth"])):
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+async def check_company_credentials(user: UserOut = Security(get_current_active_user, scopes=["company"])) -> None:
+    if not user.is_company:
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized")
+    return user
+
+
+async def check_superuser_credentials(user: UserOut = Security(get_current_active_user, scopes=["superuser"])) -> None:
+    if not user.is_superuser:
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized")
+    return user
+

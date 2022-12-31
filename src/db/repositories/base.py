@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import status
 from typing import Generic, List, Type, TypeVar
 
@@ -47,14 +49,17 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
         return instance
 
     async def update(self, pk: int, obj: ModelType) -> ModelType:
-        query = update(self.model).where(self.model.id == pk).values(**obj.dict()).execution_options(synchronize_session="fetch")
-        await db.execute(query)
+        obj_dict = obj.dict()
+        del obj_dict['created_at']
+        obj_dict['updated_at'] = obj_dict['updated_at'] = datetime.utcnow()
+        query = update(self.model).where(self.model.id == pk).values(**obj_dict).returning(self.model)
+        instance = await db.execute(query)
         try:
             await db.commit()
         except Exception:
             await db.rollback()
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect value was entered")
-        return obj.dict()
+        return instance.one_or_none()
 
     async def delete(self, pk: int):
         query = delete(self.model).where(self.model.id == pk)

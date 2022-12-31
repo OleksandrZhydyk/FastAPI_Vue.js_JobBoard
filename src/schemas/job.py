@@ -4,10 +4,8 @@ from datetime import datetime
 
 class JobCreate(BaseModel):
     email: EmailStr
-    user_id: int
     title: str
     description: str
-    is_active: bool
     salary_from: int = Field(..., gt=0)
     salary_to: int = Field(..., gt=0)
 

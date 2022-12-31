@@ -1,12 +1,13 @@
 from datetime import datetime
-from fastapi import status, Depends
+from fastapi import status
 from sqlalchemy import update
 from fastapi import HTTPException
+from starlette.status import HTTP_401_UNAUTHORIZED
 
 from src.core.security import hash_password
 from src.db.base import db
 from src.db.repositories.base import BaseService
-from src.schemas.user import UserCreate, UserOut, UserBase, UserUpdate
+from src.schemas.user import UserCreate, UserOut, UserUpdate
 from src.db.models.users import User
 
 
@@ -32,20 +33,26 @@ class UsersService(BaseService[UserOut, UserCreate]):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
         return db_obj
 
-    async def update(self, pk: int, obj: UserOut) -> UserUpdate:
-        obj_dict = obj.dict()
-        obj_dict['updated_at'] = datetime.utcnow()
-        del obj_dict['created_at']
-        query = update(self.model).where(self.model.id == pk)\
-            .values(**obj_dict)\
-            .execution_options(synchronize_session="fetch")
-        await db.execute(query)
-        try:
-            await db.commit()
-        except Exception:
-            await db.rollback()
-            raise
-        return obj_dict
+    async def update(self, pk: int, obj: UserCreate, user: UserOut) -> UserOut:
+        data_user = await self.get_one(pk)
+        if data_user.id == user.id or user.is_superuser:
+            return await super().update(pk, obj)
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action")
+
+    # async def update(self, pk: int, obj: UserOut) -> UserUpdate:
+    #     obj_dict = obj.dict()
+    #     obj_dict['updated_at'] = datetime.utcnow()
+    #     del obj_dict['created_at']
+    #     query = update(self.model).where(self.model.id == pk)\
+    #         .values(**obj_dict)\
+    #         .execution_options(synchronize_session="fetch")
+    #     await db.execute(query)
+    #     try:
+    #         await db.commit()
+    #     except Exception:
+    #         await db.rollback()
+    #         raise
+    #     return obj_dict
 
 
 def get_users_service() -> UsersService:
