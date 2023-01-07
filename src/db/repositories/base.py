@@ -1,12 +1,14 @@
+from datetime import datetime
+
 from fastapi import status
 from typing import Generic, List, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException
 
 from src.db.base import Base
-from src.db.base import db
 from sqlalchemy.future import select
 
 
@@ -20,7 +22,7 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
     def __init__(self, model: Type[ModelType]):
         self.model = model
 
-    async def create(self, obj: CreateSchemaType) -> ModelType:
+    async def create(self, obj: CreateSchemaType, db: AsyncSession) -> ModelType:
         instance = self.model(**obj.dict())
         db.add(instance)
         try:
@@ -30,7 +32,7 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect value was entered")
         return instance
 
-    async def get_all(self) -> List[ModelType]:
+    async def get_all(self, db: AsyncSession) -> List[ModelType]:
         query = select(self.model)
         db_obj: List[ModelType] = await db.execute(query)
         instances = db_obj.scalars().all()
@@ -38,7 +40,7 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects")
         return instances
 
-    async def get_one(self, pk: int) -> ModelType:
+    async def get_one(self, pk: int, db: AsyncSession) -> ModelType:
         query = select(self.model).where(self.model.id == pk)
         db_obj = await db.execute(query)
         instance = db_obj.scalar()
@@ -46,17 +48,20 @@ class BaseService(Generic[ModelType, CreateSchemaType]):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object")
         return instance
 
-    async def update(self, pk: int, obj: ModelType) -> ModelType:
-        query = update(self.model).where(self.model.id == pk).values(**obj.dict()).execution_options(synchronize_session="fetch")
-        await db.execute(query)
+    async def update(self, pk: int, obj: ModelType, db: AsyncSession) -> ModelType:
+        obj_dict = obj.dict()
+        del obj_dict['created_at']
+        obj_dict['updated_at'] = obj_dict['updated_at'] = datetime.utcnow()
+        query = update(self.model).where(self.model.id == pk).values(**obj_dict).returning(self.model)
+        instance = await db.execute(query)
         try:
             await db.commit()
         except Exception:
             await db.rollback()
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect value was entered")
-        return obj.dict()
+        return instance.one_or_none()
 
-    async def delete(self, pk: int):
+    async def delete(self, pk: int, db: AsyncSession):
         query = delete(self.model).where(self.model.id == pk)
         await db.execute(query)
         try:

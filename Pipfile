@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
-sqlalchemy = "*"
+sqlalchemy = {extras = ["asyncio"], version = "*"}
 databases = {extras = ["postgresql"], version = "*"}
 users = "*"
 passlib = "*"
@@ -17,6 +17,13 @@ asyncpg = "*"
 config = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 python-multipart = "*"
+pytest = "*"
+httpx = "*"
+sqlalchemy-utils = "*"
+asgi-lifespan = "*"
+anyio = {extras = ["trio"], version = "*"}
+pytest-asyncio = "*"
+typer = "*"
 
 [dev-packages]
 

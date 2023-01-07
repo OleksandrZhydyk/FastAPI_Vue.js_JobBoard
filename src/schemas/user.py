@@ -7,6 +7,7 @@ class UserBase(BaseModel):
     email: EmailStr
     name: str
     is_company: bool
+    is_active: bool
 
 
 class UserOut(UserBase):
@@ -44,5 +45,5 @@ class UserCreate(UserBase):
         orm_mode = True
 
 
-class UserInDB(UserBase):
+class UserInDB(UserOut):
     hashed_password: str

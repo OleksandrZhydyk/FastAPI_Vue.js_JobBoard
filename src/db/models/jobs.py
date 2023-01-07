@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, DateTime
+from sqlalchemy.orm import relationship
 
 from src.db.base import Base
 
@@ -17,3 +18,8 @@ class Job(Base):
     updated_at = Column(DateTime, index=True, default=datetime.utcnow)
     salary_from = Column(Integer)
     salary_to = Column(Integer)
+
+    user = relationship("User", back_populates="jobs")
+
+
+
