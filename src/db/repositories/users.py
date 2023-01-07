@@ -1,11 +1,13 @@
 from datetime import datetime
-from fastapi import status
+from fastapi import status, Depends
 from sqlalchemy import update
 from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_401_UNAUTHORIZED
 
+from src.db.base import init_models
+# from src.db.base import db
 from src.core.security import hash_password
-from src.db.base import db
 from src.db.repositories.base import BaseService
 from src.schemas.user import UserCreate, UserOut, UserUpdate
 from src.db.models.users import User
@@ -15,7 +17,7 @@ class UsersService(BaseService[UserOut, UserCreate]):
     def __init__(self):
         super().__init__(User)
 
-    async def create(self, obj: UserCreate) -> UserOut:
+    async def create(self, obj: UserCreate, db: AsyncSession) -> UserOut:
         obj_dict = obj.dict()
         hashed_password = hash_password(obj_dict.get('password'))
         db_obj = self.model(
@@ -33,10 +35,10 @@ class UsersService(BaseService[UserOut, UserCreate]):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
         return db_obj
 
-    async def update(self, pk: int, obj: UserCreate, user: UserOut) -> UserOut:
+    async def update(self, pk: int, obj: UserCreate, db: AsyncSession, user: UserOut) -> UserOut:
         data_user = await self.get_one(pk)
         if data_user.id == user.id or user.is_superuser:
-            return await super().update(pk, obj)
+            return await super().update(pk, obj, db)
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action")
 
     # async def update(self, pk: int, obj: UserOut) -> UserUpdate:

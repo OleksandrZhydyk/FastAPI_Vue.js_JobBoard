@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 
 from src.db.base import Base
 
@@ -16,3 +17,6 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     updated_at = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    jobs = relationship("Job", back_populates="user")
+

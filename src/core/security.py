@@ -2,16 +2,18 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import jwt, JWTError
 from pydantic import ValidationError
+from sqlalchemy.ext.asyncio import AsyncSession
+# from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from starlette import status
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from src.schemas.job import JobOut
 from src.schemas.user import UserInDB, UserOut
 from src.schemas.token import TokenRead
 from src.db.models.users import User
 
-from src.db.base import db
+# from src.db.base import db
+from src.db.base import get_session
 from src.core.config import Config
 from datetime import datetime, timedelta
 
@@ -66,7 +68,9 @@ def create_refresh_token(data: dict) -> str:
     return encoded_jwt
 
 
-async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)):
+async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme),
+                           db: AsyncSession = Depends(get_session),
+                           ):
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     else:
