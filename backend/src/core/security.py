@@ -8,13 +8,13 @@ from sqlalchemy.future import select
 from starlette import status
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from src.schemas.user import UserInDB, UserOut
-from src.schemas.token import TokenRead
-from src.db.models.users import User
+from schemas.user import UserInDB, UserOut
+from schemas.token import TokenRead
+from db.models.users import User
 
 # from src.db.base import db
-from src.db.base import get_session
-from src.core.config import Config
+from db.base import get_session
+from core.config import Config
 from datetime import datetime, timedelta
 
 from passlib.context import CryptContext

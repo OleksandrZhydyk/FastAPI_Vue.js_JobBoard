@@ -1,16 +1,13 @@
-from datetime import datetime
-from fastapi import status, Depends
-from sqlalchemy import update
+from fastapi import status
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from src.db.base import init_models
 # from src.db.base import db
-from src.core.security import hash_password
-from src.db.repositories.base import BaseService
-from src.schemas.user import UserCreate, UserOut, UserUpdate
-from src.db.models.users import User
+from core.security import hash_password
+from db.repositories.base import BaseService
+from schemas.user import UserCreate, UserOut
+from db.models.users import User
 
 
 class UsersService(BaseService[UserOut, UserCreate]):

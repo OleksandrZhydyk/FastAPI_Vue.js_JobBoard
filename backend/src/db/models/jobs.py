@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, DateTime
 from sqlalchemy.orm import relationship
 
-from src.db.base import Base
+from db.base import Base
 
 
 class Job(Base):

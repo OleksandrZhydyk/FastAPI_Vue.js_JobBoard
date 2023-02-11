@@ -5,11 +5,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src.core.security import authenticate_user, create_access_token, create_refresh_token
-from src.schemas.token import Token
-from src.endpoints.jobs import router_jobs
-from src.endpoints.users import router_users
-from src.db.base import init_models, get_session
+from core.security import authenticate_user, create_access_token, create_refresh_token
+from schemas.token import Token
+from endpoints.jobs import router_jobs
+from endpoints.users import router_users
+from db.base import init_models, get_session
 
 
 def get_application() -> FastAPI:

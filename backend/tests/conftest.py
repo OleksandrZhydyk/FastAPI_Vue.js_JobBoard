@@ -13,7 +13,7 @@ os.environ['TESTING'] = 'True'
 
 @pytest.fixture(scope="session")
 def app() -> FastAPI:
-    from src.main import get_application  # local import for testing purpose
+    from backend.src.main import get_application  # local import for testing purpose
 
     app = get_application()
     return app

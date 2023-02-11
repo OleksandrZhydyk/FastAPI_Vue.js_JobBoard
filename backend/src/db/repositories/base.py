@@ -8,7 +8,7 @@ from sqlalchemy import update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException
 
-from src.db.base import Base
+from db.base import Base
 from sqlalchemy.future import select
 
 
