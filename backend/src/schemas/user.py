@@ -1,6 +1,9 @@
 from datetime import datetime
+from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr, validator, constr
+
+# from schemas.job import JobOut
 
 
 class UserBase(BaseModel):
@@ -11,6 +14,7 @@ class UserBase(BaseModel):
 
 
 class UserOut(UserBase):
+    id: int
     created_at: datetime
     updated_at: datetime
 
@@ -22,7 +26,7 @@ class UserOut(UserBase):
 
 
 class UserUpdate(UserBase):
-    updated_at: datetime
+    password: constr(min_length=8)
 
     class Config:
         orm_mode = True
@@ -44,6 +48,9 @@ class UserCreate(UserBase):
     class Config:
         orm_mode = True
 
+
+# class CompanyJobsSchema(UserOut):
+#     jobs: List[JobOut]
 
 class UserInDB(UserOut):
     hashed_password: str

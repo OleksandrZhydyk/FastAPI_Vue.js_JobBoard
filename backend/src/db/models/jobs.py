@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, DateT
 from sqlalchemy.orm import relationship
 
 from db.base import Base
+from db.models.users import association_table
 
 
 class Job(Base):
@@ -19,7 +20,10 @@ class Job(Base):
     salary_from = Column(Integer)
     salary_to = Column(Integer)
 
-    user = relationship("User", back_populates="jobs")
+    appliers = relationship("User", secondary=association_table, back_populates="vacancies")
+
+    user = relationship("User")
+
 
 
 

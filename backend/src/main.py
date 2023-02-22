@@ -1,6 +1,8 @@
 import asyncio
 
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi_pagination import add_pagination
+from fastapi.middleware.cors import CORSMiddleware 
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -50,3 +52,13 @@ def get_application() -> FastAPI:
 
 
 app = get_application()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+add_pagination(app)

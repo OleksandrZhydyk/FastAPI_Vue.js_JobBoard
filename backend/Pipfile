@@ -24,6 +24,7 @@ asgi-lifespan = "*"
 anyio = {extras = ["trio"], version = "*"}
 pytest-asyncio = "*"
 typer = "*"
+fastapi-pagination = "*"
 
 [dev-packages]
 

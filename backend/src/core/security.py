@@ -71,6 +71,7 @@ def create_refresh_token(data: dict) -> str:
 async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme),
                            db: AsyncSession = Depends(get_session),
                            ):
+    print(security_scopes.scopes)
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     else:
@@ -86,6 +87,7 @@ async def get_current_user(security_scopes: SecurityScopes, token: str = Depends
         if email is None:
             raise credentials_exception
         token_scopes = payload.get("scopes", [])
+        print(token_scopes)
         token_data = TokenRead(scopes=token_scopes, email=email)
     except (JWTError, ValidationError):
         raise credentials_exception
@@ -115,8 +117,8 @@ async def check_company_credentials(user: UserOut = Security(get_current_active_
     return user
 
 
-async def check_superuser_credentials(user: UserOut = Security(get_current_active_user, scopes=["superuser"])) -> None:
+async def check_superuser_credentials(user: UserOut = Security(get_current_active_user, scopes=['superuser'])) -> None:
     if not user.is_superuser:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized")
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized super")
     return user
 

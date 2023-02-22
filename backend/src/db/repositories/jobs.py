@@ -1,25 +1,38 @@
-from fastapi import HTTPException, Depends
+from datetime import datetime
+from typing import List
+
+from fastapi import HTTPException
+from fastapi_pagination.ext.async_sqlalchemy import paginate
+from sqlalchemy import insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-# from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 from starlette import status
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from core.security import get_current_active_user
+from db.models.users import association_table
 # from db.base import db
 from schemas.user import UserOut
-from db.repositories.base import BaseService
-from schemas.job import JobCreate, JobOut
+from schemas.job import JobCreate, JobOut, JobDetail
 from db.models.jobs import Job
 
 
-class JobsService(BaseService[JobCreate, JobOut]):
+class JobsService():
     def __init__(self):
-        super().__init__(Job)
+        self.model = Job
 
-    async def create(self, obj: JobCreate, db: AsyncSession,
-                     user: UserOut = Depends(get_current_active_user)) -> JobOut:
-        obj_dict = obj.dict()
-        obj_dict['user_id'] = user.id
+    async def get_one(self, pk: int, db: AsyncSession) -> JobDetail:
+        print(pk)
+        query = select(self.model).where(self.model.id == pk).options(joinedload(Job.user))
+        db_obj = await db.execute(query)
+        instance = db_obj.scalar()
+        if not instance:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object")
+        return instance
+
+    async def create(self, obj_in: JobCreate, user_db: UserOut, db: AsyncSession) -> JobOut:
+        obj_dict = obj_in.dict()
+        obj_dict['user_id'] = user_db.id
         instance = self.model(**obj_dict)
         db.add(instance)
         try:
@@ -29,12 +42,56 @@ class JobsService(BaseService[JobCreate, JobOut]):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
         return instance
 
-    async def update(self, pk: int, obj: JobCreate, db: AsyncSession, user: UserOut) -> JobOut:
-        job = await self.get_one(pk)
-        if job.user_id == user.id or user.is_superuser:
-            return await super().update(pk, obj, db)
+    async def update(self, pk: int, obj_in: JobCreate, user_db: UserOut, db: AsyncSession,) -> JobOut:
+        job = await self.get_one(pk, db)
+        if job.user_id == user_db.id or user_db.is_superuser:
+            if isinstance(obj_in, dict):
+                obj_dict = obj_in
+            else:
+                obj_dict = obj_in.dict(exclude_unset=True)
+            obj_dict['updated_at'] = datetime.utcnow()
+            query = update(self.model).where(self.model.id == pk).values(**obj_dict).returning(self.model)
+            instance = await db.execute(query)
+            try:
+                await db.commit()
+            except Exception:
+                await db.rollback()
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect value was entered")
+            return instance.one_or_none()
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action")
 
+    async def get_all(self, db: AsyncSession) -> List[Job]:
+        query = select(self.model)
+        db_obj = await paginate(db, query)
+        if not db_obj:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects")
+        return db_obj
+
+    async def apply_to_job(self, job_pk: int, user_db: UserOut, db: AsyncSession):
+        query = insert(association_table).values({'user_id': user_db.id, 'job_id': job_pk})
+        await db.execute(query)
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
+        return True
+
+    async def delete(self, pk: int, db: AsyncSession):
+        query = delete(self.model).where(self.model.id == pk)
+        await db.execute(query)
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object to delete")
+        return True
+
+    async def get_job_appliers(self, job_pk: int, user_db: UserOut, db: AsyncSession,):
+        users_query = select(self.model).where(self.model.id == job_pk).options(joinedload(Job.appliers))
+        db_obj = await db.execute(users_query)
+        instance = db_obj.scalar()
+        return instance
 
 
 def get_jobs_service() -> JobsService:

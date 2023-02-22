@@ -1,5 +1,9 @@
+from typing import List, Optional
+
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
+
+from schemas.user import UserOut
 
 
 class JobCreate(BaseModel):
@@ -11,6 +15,7 @@ class JobCreate(BaseModel):
 
 
 class JobOut(JobCreate):
+    id: int
     created_at: datetime
     updated_at: datetime
 
@@ -19,3 +24,8 @@ class JobOut(JobCreate):
         json_encoders = {
             datetime: lambda date: date.isoformat()[:-3] + 'Z'
         }
+
+class JobDetail(JobOut):
+    user: UserOut
+class JobApplied(JobOut):
+    appliers: Optional[List[UserOut]]

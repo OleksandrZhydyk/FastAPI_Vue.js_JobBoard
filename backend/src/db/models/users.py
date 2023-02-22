@@ -1,9 +1,17 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
 from db.base import Base
+
+
+association_table = Table(
+    "association_table",
+    Base.metadata,
+    Column("user_id", ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+    Column("job_id", ForeignKey("jobs.id", ondelete="CASCADE"), primary_key=True),
+)
 
 
 class User(Base):
@@ -17,6 +25,8 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     updated_at = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
+    created_jobs = relationship("Job", backref="company_created")
 
-    jobs = relationship("Job", back_populates="user")
+    vacancies = relationship('Job', secondary="association_table", back_populates="appliers")
+    # job = relationship("Job")
 
