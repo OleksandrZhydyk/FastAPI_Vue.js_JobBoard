@@ -7,6 +7,20 @@ from db.base import Base
 from db.models.users import association_table
 
 
+
+# @enum.unique
+# class JobCategory(enum.Enum):
+#     finance = 'Finance'
+#     marketing = 'Marketing'
+#     agro = 'Agriculture'
+#     it = 'IT'
+#     metallurgy = 'Metallurgy'
+#     medicine = 'Medicine'
+#     construction = 'Construction'
+#     building = 'Building'
+#     services = 'Services'
+#     miscellaneous = 'Miscellaneous'
+
 class Job(Base):
     __tablename__ = "jobs"
     id = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
@@ -19,6 +33,7 @@ class Job(Base):
     updated_at = Column(DateTime, index=True, default=datetime.utcnow)
     salary_from = Column(Integer)
     salary_to = Column(Integer)
+    category = Column(String, nullable=False)
 
     appliers = relationship("User", secondary=association_table, back_populates="vacancies")
 

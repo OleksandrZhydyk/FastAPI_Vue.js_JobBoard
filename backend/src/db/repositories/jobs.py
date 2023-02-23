@@ -13,7 +13,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 from db.models.users import association_table
 # from db.base import db
 from schemas.user import UserOut
-from schemas.job import JobCreate, JobOut, JobDetail
+from schemas.job import JobCreate, JobOut, JobDetail, JobUpdate, JobCategoryEnum
 from db.models.jobs import Job
 
 
@@ -22,33 +22,32 @@ class JobsService():
         self.model = Job
 
     async def get_one(self, pk: int, db: AsyncSession) -> JobDetail:
-        print(pk)
         query = select(self.model).where(self.model.id == pk).options(joinedload(Job.user))
         db_obj = await db.execute(query)
         instance = db_obj.scalar()
+        # print(instance.category.value)
         if not instance:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object")
         return instance
 
-    async def create(self, obj_in: JobCreate, user_db: UserOut, db: AsyncSession) -> JobOut:
+    async def create(self, obj_in: JobCreate, user_db: UserOut, db: AsyncSession, job_category) -> JobOut:
         obj_dict = obj_in.dict()
+        obj_dict['category'] = job_category.name
         obj_dict['user_id'] = user_db.id
         instance = self.model(**obj_dict)
         db.add(instance)
         try:
             await db.commit()
-        except Exception:
+        except Exception as e:
             await db.rollback()
+            print(e)
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
         return instance
 
-    async def update(self, pk: int, obj_in: JobCreate, user_db: UserOut, db: AsyncSession,) -> JobOut:
+    async def update(self, pk: int, obj_in: JobUpdate, user_db: UserOut, db: AsyncSession,) -> JobOut:
         job = await self.get_one(pk, db)
         if job.user_id == user_db.id or user_db.is_superuser:
-            if isinstance(obj_in, dict):
-                obj_dict = obj_in
-            else:
-                obj_dict = obj_in.dict(exclude_unset=True)
+            obj_dict = obj_in.dict(exclude_none=True)
             obj_dict['updated_at'] = datetime.utcnow()
             query = update(self.model).where(self.model.id == pk).values(**obj_dict).returning(self.model)
             instance = await db.execute(query)
@@ -60,8 +59,8 @@ class JobsService():
             return instance.one_or_none()
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action")
 
-    async def get_all(self, db: AsyncSession) -> List[Job]:
-        query = select(self.model)
+    async def get_all(self, db: AsyncSession, job_category) -> List[Job]:
+        query = select(self.model).filter(self.model.title == 'Job1')
         db_obj = await paginate(db, query)
         if not db_obj:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects")

@@ -10,7 +10,7 @@ from db.base import get_session
 from core.security import check_company_credentials, get_current_active_user
 from schemas.user import UserOut
 from db.repositories.jobs import JobsService, get_jobs_service
-from schemas.job import JobCreate, JobOut, JobDetail, JobApplied
+from schemas.job import JobCreate, JobOut, JobDetail, JobApplied, JobUpdate, JobCategoryEnum
 
 router_jobs = APIRouter()
 
@@ -18,14 +18,16 @@ router_jobs = APIRouter()
 @router_jobs.post("/", response_model=JobOut)
 async def create_job(obj_in: JobCreate, job_service: JobsService = Depends(get_jobs_service),
                      current_user: UserOut = Depends(check_company_credentials),
-                     db: AsyncSession = Depends(get_session),):
-    return await job_service.create(obj_in, current_user, db)
+                     db: AsyncSession = Depends(get_session),
+                     job_category: JobCategoryEnum = JobCategoryEnum.miscellaneous):
+    return await job_service.create(obj_in, current_user, db, job_category)
 
 
 @router_jobs.get("/", response_model=Page[JobOut])
 async def get_jobs(job_service: JobsService = Depends(get_jobs_service),
-                   db: AsyncSession = Depends(get_session), ):
-    return await job_service.get_all(db)
+                   db: AsyncSession = Depends(get_session),
+                   job_category: JobCategoryEnum = ''):
+    return await job_service.get_all(db, job_category)
 
 
 @router_jobs.get("/{pk}", response_model=JobDetail)
@@ -43,7 +45,7 @@ async def apply_to_job(pk: int,
 
 
 @router_jobs.put("/{pk}", response_model=JobOut)
-async def update_job(obj: Union[JobCreate, Dict[str, Any]], pk: int, job_service: JobsService = Depends(get_jobs_service),
+async def update_job(obj: JobUpdate, pk: int, job_service: JobsService = Depends(get_jobs_service),
                      db: AsyncSession = Depends(get_session),
                      current_user: UserOut = Depends(check_company_credentials)):
     return await job_service.update(pk, obj, current_user, db)

@@ -14,6 +14,9 @@ association_table = Table(
 )
 
 
+
+
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)

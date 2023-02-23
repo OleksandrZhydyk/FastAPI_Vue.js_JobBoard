@@ -34,7 +34,7 @@ async def get_me(current_user: UserOut = Depends(get_current_active_user),):
 
 
 @router_users.put("/me", response_model=UserOut)
-async def update_user(obj_in: Union[UserUpdate, Dict[str, Any]], user_service: UsersService = Depends(get_users_service),
+async def update_user(obj_in: UserUpdate, user_service: UsersService = Depends(get_users_service),
                       db: AsyncSession = Depends(get_session),
                       current_user: UserOut = Depends(get_current_active_user)):
     return await user_service.update(obj_in, current_user, db)
@@ -55,10 +55,10 @@ async def get_one(pk: int, user_service: UsersService = Depends(get_users_servic
 
 
 @router_users.put("/{pk}", response_model=UserUpdate)
-async def update_user(obj_in: UserOut, pk: int, user_service: UsersService = Depends(get_users_service),
+async def update_user(obj_in: UserUpdate, user_service: UsersService = Depends(get_users_service),
                       current_user: UserInDB = Depends(check_superuser_credentials),
-                      db: AsyncSession = Depends(get_session)) -> UserUpdate:
-    return await user_service.update(pk, obj_in, current_user, db)
+                      db: AsyncSession = Depends(get_session)) -> UserOut:
+    return await user_service.update(obj_in, current_user, db)
 
 
 @router_users.delete("/{pk}", response_model=bool)

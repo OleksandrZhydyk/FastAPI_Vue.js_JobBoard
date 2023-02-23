@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr, validator, constr
 
 class UserBase(BaseModel):
     email: EmailStr
-    name: str
+    name: constr(min_length=1)
     is_company: bool
     is_active: bool
 
@@ -25,8 +25,10 @@ class UserOut(UserBase):
         }
 
 
-class UserUpdate(UserBase):
-    password: constr(min_length=8)
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr]
+    name: Optional[constr(min_length=1)]
+    password: Optional[constr(min_length=8)]
 
     class Config:
         orm_mode = True
