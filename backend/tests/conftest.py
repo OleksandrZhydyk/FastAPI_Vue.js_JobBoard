@@ -1,6 +1,10 @@
 import asyncio
 import os
 
+from sqlalchemy.dialects.postgresql import insert
+
+os.environ['TESTING'] = 'True'
+
 import alembic
 import pytest
 import pytest_asyncio
@@ -8,16 +12,14 @@ from alembic.config import Config
 from fastapi import FastAPI
 from httpx import AsyncClient
 
-
-os.environ['TESTING'] = 'True'
-
+from db.models.jobs import Job
 from db.base import async_session, engine, Base
 from schemas.user import UserOut
 from core.security import hash_password, create_access_token
-from db.models.users import User
+from db.models.users import User, association_table
 
 
-@pytest.fixture(autouse=True, scope="module")
+@pytest.fixture(autouse=True, scope="session")
 def event_loop():
     loop = asyncio.new_event_loop()
     yield loop
@@ -32,7 +34,7 @@ def app() -> FastAPI:
     return app
 
 
-@pytest.fixture(autouse=True)
+@pytest_asyncio.fixture(autouse=True)
 def db_models():
     # async with engine.begin() as conn:
     #     await conn.run_sync(Base.metadata.create_all)
@@ -44,13 +46,13 @@ def db_models():
     alembic.command.downgrade(config, "base")
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def session():
     session = async_session()
     yield session
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def create_user(session):
     db_obj = User(
         email="test@test.com",
@@ -63,7 +65,7 @@ async def create_user(session):
     return db_obj
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def create_company(session):
     db_obj = User(
         email="company@test.com",
@@ -77,7 +79,32 @@ async def create_company(session):
     return db_obj
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
+async def create_job(session, create_company):
+    db_obj = Job(
+        email="test_job@test.com",
+        title="TestJob",
+        description="testpass",
+        salary_from=10,
+        salary_to=20,
+        user_id=create_company.id
+    )
+    session.add(db_obj)
+    await session.commit()
+    return db_obj
+
+
+@pytest.fixture
+async def apply_to_job(session, create_user, create_job):
+    query = insert(association_table).values({'user_id': create_user.id, 'job_id': create_job.id})
+    await session.execute(query)
+    try:
+        await session.commit()
+    except Exception:
+        await session.rollback()
+
+
+@pytest.fixture
 async def create_superuser(session):
     db_obj = User(
         email="superuser@test.com",
@@ -91,7 +118,7 @@ async def create_superuser(session):
     return db_obj
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def client(app: FastAPI) -> AsyncClient:
     async with AsyncClient(
         app=app,
@@ -101,25 +128,25 @@ async def client(app: FastAPI) -> AsyncClient:
         yield client
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 def token(create_user: UserOut) -> str:
     access_token = create_access_token(data={"sub": create_user.email, "scopes": ["auth"]})
     return access_token
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 def company_token(create_company: UserOut) -> str:
     access_token = create_access_token(data={"sub": create_company.email, "scopes": ["auth", "company"]})
     return access_token
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 def superuser_token(create_superuser: UserOut) -> str:
     access_token = create_access_token(data={"sub": create_superuser.email, "scopes": ["auth", "superuser"]})
     return access_token
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 def authorized_client(client: AsyncClient, token: str) -> AsyncClient:
     client.headers = {
         "Authorization": f"Bearer {token}",
@@ -128,7 +155,7 @@ def authorized_client(client: AsyncClient, token: str) -> AsyncClient:
     return client
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 def company_client(client: AsyncClient, company_token: str) -> AsyncClient:
     client.headers = {
         "Authorization": f"Bearer {company_token}",
@@ -137,7 +164,7 @@ def company_client(client: AsyncClient, company_token: str) -> AsyncClient:
     return client
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 def superuser_client(client: AsyncClient, superuser_token: str) -> AsyncClient:
     client.headers = {
         "Authorization": f"Bearer {superuser_token}",

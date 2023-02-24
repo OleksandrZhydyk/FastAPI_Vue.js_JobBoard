@@ -48,17 +48,18 @@ def get_application() -> FastAPI:
                 "refresh_token": refresh_token,
                 "token_type": "bearer"}
 
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:8080"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    add_pagination(app)
+
     return app
 
 
 app = get_application()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-add_pagination(app)

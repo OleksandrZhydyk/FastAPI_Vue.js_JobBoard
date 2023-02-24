@@ -1,15 +1,14 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, DateTime
+from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, DateTime, Enum
 from sqlalchemy.orm import relationship
 
 from db.base import Base
 from db.models.users import association_table
+from schemas.job import JobCategory
 
 
-
-# @enum.unique
-# class JobCategory(enum.Enum):
+# class JobCategory(str, enum.Enum):
 #     finance = 'Finance'
 #     marketing = 'Marketing'
 #     agro = 'Agriculture'
@@ -33,7 +32,7 @@ class Job(Base):
     updated_at = Column(DateTime, index=True, default=datetime.utcnow)
     salary_from = Column(Integer)
     salary_to = Column(Integer)
-    category = Column(String, nullable=False)
+    category = Column(Enum(JobCategory), server_default='miscellaneous', nullable=False)
 
     appliers = relationship("User", secondary=association_table, back_populates="vacancies")
 

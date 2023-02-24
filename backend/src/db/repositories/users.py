@@ -40,7 +40,9 @@ class UsersService():
         return db_obj
 
     async def update(self, obj_in: UserUpdate, user_db: UserOut, db: AsyncSession) -> UserOut:
+        print(obj_in)
         obj_dict = obj_in.dict(exclude_none=True)
+        print(obj_dict)
         obj_dict['updated_at'] = datetime.utcnow()
         if obj_dict.get("password"):
             hashed_password = hash_password(obj_dict["password"])

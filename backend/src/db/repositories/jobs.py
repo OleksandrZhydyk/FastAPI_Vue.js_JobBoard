@@ -13,7 +13,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 from db.models.users import association_table
 # from db.base import db
 from schemas.user import UserOut
-from schemas.job import JobCreate, JobOut, JobDetail, JobUpdate, JobCategoryEnum
+from schemas.job import JobCreate, JobOut, JobDetail, JobUpdate, JobCategory
 from db.models.jobs import Job
 
 
@@ -25,14 +25,13 @@ class JobsService():
         query = select(self.model).where(self.model.id == pk).options(joinedload(Job.user))
         db_obj = await db.execute(query)
         instance = db_obj.scalar()
-        # print(instance.category.value)
         if not instance:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object")
         return instance
 
     async def create(self, obj_in: JobCreate, user_db: UserOut, db: AsyncSession, job_category) -> JobOut:
         obj_dict = obj_in.dict()
-        obj_dict['category'] = job_category.name
+        obj_dict['category'] = job_category
         obj_dict['user_id'] = user_db.id
         instance = self.model(**obj_dict)
         db.add(instance)
@@ -60,7 +59,9 @@ class JobsService():
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action")
 
     async def get_all(self, db: AsyncSession, job_category) -> List[Job]:
-        query = select(self.model).filter(self.model.title == 'Job1')
+        query = select(self.model)
+        if job_category is not None:
+            query = select(self.model).filter(self.model.category == job_category)
         db_obj = await paginate(db, query)
         if not db_obj:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects")

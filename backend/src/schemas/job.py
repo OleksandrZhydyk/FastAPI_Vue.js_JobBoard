@@ -7,7 +7,7 @@ from datetime import datetime
 from schemas.user import UserOut
 
 
-class JobCategoryEnum(str, Enum):
+class JobCategory(str, Enum):
     finance = 'Finance'
     marketing = 'Marketing'
     agro = 'Agriculture'
@@ -40,7 +40,7 @@ class JobOut(JobCreate):
     id: int
     created_at: datetime
     updated_at: datetime
-    category: str
+    category: JobCategory
 
     class Config:
         orm_mode = True

@@ -3,7 +3,6 @@ from starlette import status
 
 
 async def test_create_user(client):
-
     user = {"email": "test_user@test.com",
             "name": "Test",
             "password": "testpass",
@@ -17,6 +16,118 @@ async def test_create_user(client):
     assert resp.json()["name"] == "Test"
     assert resp.json()["is_company"] is True
     assert resp.json()["is_active"] is True
+
+
+@pytest.mark.parametrize(
+    "user_data, expected_status_code, expected_detail",
+    (
+        (
+            {
+                "email": "test_user@test.com",
+                "name": "Test",
+                "is_company": "false",
+                "password": "123",
+                "confirmed_password": "123"
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail":
+                    [
+                        {"loc": ["body", "password"],
+                         "msg": "ensure this value has at least 8 characters",
+                         "type": "value_error.any_str.min_length",
+                         "ctx": {"limit_value": 8}
+                         }
+                    ]
+             }
+        ),
+        (
+            {
+                "email": "test_user@test.com",
+                "name": "Test",
+                "is_company": "false",
+                "password": "password",
+                "confirmed_password": "changed_password",
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail":
+                    [
+                        {
+                            "loc": ["body", "confirmed_password"],
+                            "msg": "Please enter the same value for password and confirmed password field",
+                            "type": "value_error"
+                        }
+                    ]
+            }
+        ),
+        (
+            {
+                "email": "test_user@test.com",
+                "is_company": "false",
+                "password": "password",
+                "confirmed_password": "password",
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail": [
+                    {
+                        "loc": ["body", "name"],
+                        "msg": "field required",
+                        "type": "value_error.missing"
+                    }
+                ]
+            }
+        ),
+        (
+            {
+                "email": "not_email",
+                "name": "Test",
+                "is_company": "false",
+                "password": "password",
+                "confirmed_password": "password",
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail":
+                    [
+                        {
+                            "loc": ["body", "email"],
+                            "msg": "value is not a valid email address",
+                            "type": "value_error.email"
+                        }
+                    ]
+            }
+        ),
+        (
+            {
+                "email": "test_user@test.com",
+                "name": "",
+                "is_company": "false",
+                "password": "password",
+                "confirmed_password": "password",
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail":
+                    [
+                        {
+                            "loc": ["body", "name"],
+                            "msg": "ensure this value has at least 1 characters",
+                            "type": "value_error.any_str.min_length",
+                            "ctx": {
+                                "limit_value": 1
+                            }
+                        }
+                    ]
+                }
+        ),
+    )
+)
+async def test_create_user_fail(client, user_data, expected_status_code, expected_detail):
+    resp = await client.post('users/', json=user_data)
+    assert resp.status_code == expected_status_code
+    assert resp.json() == expected_detail
 
 
 async def test_get_me(authorized_client):
@@ -50,8 +161,8 @@ async def test_user_update_of_another_user(authorized_client, create_superuser):
 @pytest.mark.parametrize(
     "update_field, update_value",
     (
-        ("email", "updated_test@test.com"),
-        ("name", "Updated"),
+            ("email", "updated_test@test.com"),
+            ("name", "Updated"),
     ),
 )
 async def test_update_me(authorized_client, update_field, update_value):
@@ -62,10 +173,54 @@ async def test_update_me(authorized_client, update_field, update_value):
 
 
 @pytest.mark.parametrize(
+    "updated_user_data, expected_status_code, expected_detail",
+    (
+            ({"name": "123"},
+             status.HTTP_422_UNPROCESSABLE_ENTITY,
+             {"detail": "Name should contains only letters"}
+             ),
+            ({"name": ""},
+             status.HTTP_422_UNPROCESSABLE_ENTITY,
+             {"detail": [
+                 {
+                     "loc": ["body", "name"],
+                     "msg": "ensure this value has at least 1 characters",
+                     "type": "value_error.any_str.min_length",
+                     "ctx": {"limit_value": 1},
+                 }
+             ]}
+             ),
+            ({"email": "123"},
+             status.HTTP_422_UNPROCESSABLE_ENTITY,
+             {"detail": [
+                 {"loc": ["body", "email"],
+                  "msg": "value is not a valid email address",
+                  "type": "value_error.email"}
+             ]
+             }
+             ),
+            ({"email": ""},
+             status.HTTP_422_UNPROCESSABLE_ENTITY,
+             {"detail": [
+                 {"loc": ["body", "email"],
+                  "msg": "value is not a valid email address",
+                  "type": "value_error.email"}
+             ]
+             },
+             ),
+    )
+)
+async def test_update_me_fail(authorized_client, updated_user_data, expected_status_code, expected_detail):
+    resp = await authorized_client.put('/users/me', json=updated_user_data)
+    assert resp.status_code == expected_status_code
+    assert resp.json() == expected_detail
+
+
+@pytest.mark.parametrize(
     "update_field, update_value",
     (
-        ("email", "updated_test@test.com"),
-        ("name", "Updated"),
+            ("email", "updated_test@test.com"),
+            ("name", "Updated"),
     ),
 )
 async def test_update_user(create_user, superuser_client, update_field, update_value):

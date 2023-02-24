@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
+from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, validator, constr
 
 # from schemas.job import JobOut
@@ -9,12 +10,12 @@ from pydantic import BaseModel, EmailStr, validator, constr
 class UserBase(BaseModel):
     email: EmailStr
     name: constr(min_length=1)
-    is_company: bool
-    is_active: bool
 
 
 class UserOut(UserBase):
     id: int
+    is_company: bool
+    is_active: bool
     created_at: datetime
     updated_at: datetime
 
@@ -27,6 +28,7 @@ class UserOut(UserBase):
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr]
+    is_company: Optional[bool]
     name: Optional[constr(min_length=1)]
     password: Optional[constr(min_length=8)]
 
@@ -36,8 +38,18 @@ class UserUpdate(BaseModel):
             datetime: lambda date: str(date)[:-3] + 'Z'
         }
 
+    @validator("name")
+    def validate_name(cls, name):
+        if name.isalpha():
+            return name
+        raise HTTPException(
+            status_code=422, detail="Name should contains only letters"
+        )
+
+
 
 class UserCreate(UserBase):
+    is_company: bool
     password: constr(min_length=8)
     confirmed_password: str
 
