@@ -27,6 +27,7 @@ async def test_get_all_jobs(authorized_client, create_job):
     assert response_data['total'] == 1
     assert response_data['items'][0]['email'] == 'test_job@test.com'
 
+
 @pytest.mark.parametrize(
     'update_field, update_value',
     (
@@ -60,6 +61,7 @@ async def test_apply_to_job(authorized_client, create_job):
     resp = await authorized_client.post(f'jobs/{create_job.id}/apply')
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() is True
+
 
 async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
     resp = await company_client.get(f'jobs/{create_job.id}/apply')

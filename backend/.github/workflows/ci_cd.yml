@@ -1,0 +1,50 @@
+name: ci_cd parts_online_store
+
+on:
+  - push
+#  - pull_request
+
+#env:
+#  DJANGO_SETTINGS_MODULE: config.settings.dev
+
+jobs:
+  test:
+      runs-on: ${{ matrix.os }}
+      strategy:
+        max-parallel: 4
+        matrix:
+          os: [ubuntu-latest]
+          python-version: ['3.8', '3.9', '3.10', '3.10.7']
+
+      services:
+        postgres:
+          image: postgres:14
+          ports:
+            - 5432:5432
+          env:
+            POSTGRES_DB: github_actions
+            POSTGRES_PASSWORD: admin
+            POSTGRES_USER: postgres
+          options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      steps:
+        - uses: actions/checkout@v2
+        - name: Setup Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python-version }}
+        - name: Install dependencies
+          run: |
+            python3 -m pip install --upgrade pip
+            python3 -m pip install pipenv
+            pipenv install
+            pipenv install --dev
+        - name: Check migrations
+          run: |
+            pipenv run alembic init -t async migrations
+            pipenv run alembic revision --autogenerate -m "init"
+            pipenv run alembic upgrade head
+        - name: Run tests
+          run: |
+            pipenv run python src/manage.py test --shuffle
+            pipenv run flake8 --max-line-length=120 --exclude=*/migrations/* --ignore=F405

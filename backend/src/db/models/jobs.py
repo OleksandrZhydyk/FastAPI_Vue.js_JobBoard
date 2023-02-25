@@ -34,9 +34,9 @@ class Job(Base):
     salary_to = Column(Integer)
     category = Column(Enum(JobCategory), server_default='miscellaneous', nullable=False)
 
-    appliers = relationship("User", secondary=association_table, back_populates="vacancies")
+    appliers = relationship("User", secondary=association_table, back_populates="vacancies", viewonly=True)
 
-    user = relationship("User")
+    user = relationship("User", viewonly=True)
 
 
 
