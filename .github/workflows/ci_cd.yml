@@ -38,9 +38,10 @@ jobs:
             python3 -m pip install --upgrade pip
             python3 -m pip install pipenv
             pipenv install
+            pipenv install alembic
             pipenv install --dev
         - name: Check migrations
-          working-directory: backend/
+#          working-directory: backend/
           run: |
 #            pipenv run alembic init -t async migrations
 #            pipenv run alembic revision --autogenerate -m "init"
