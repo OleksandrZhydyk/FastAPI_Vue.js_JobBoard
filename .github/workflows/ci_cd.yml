@@ -40,10 +40,11 @@ jobs:
             pipenv install
             pipenv install --dev
         - name: Check migrations
+          working-directory: backend/
           run: |
-            pipenv run cd backend/ && alembic init -t async migrations
-            pipenv run cd backend/ && alembic revision --autogenerate -m "init"
-            pipenv run cd backend/ && alembic upgrade head
+#            pipenv run alembic init -t async migrations
+#            pipenv run alembic revision --autogenerate -m "init"
+            pipenv run alembic upgrade head
         - name: Run tests
           run: |
             pipenv run python -m pytest
