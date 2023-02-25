@@ -32,7 +32,7 @@ async def test_get_all_jobs(authorized_client, create_job):
     'update_field, update_value',
     (
         ('email', 'updated_test_user@test.com'),
-        ('title', 'updated_title'),
+        ('title', 'updated title'),
     ),
 )
 async def test_update_job(company_client, create_job, update_field, update_value):
@@ -70,3 +70,101 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
     assert response_data['email'] == 'test_job@test.com'
     assert response_data['category'] == 'Miscellaneous'
     assert response_data['appliers'][0]['email'] == 'test@test.com'
+
+
+@pytest.mark.parametrize(
+    "job_data, expected_status_code, expected_detail",
+    (
+        (
+            {
+                'email': 'test_job@test.com',
+                'title': '123',
+                'description': 'testpass',
+                'salary_from': 10,
+                'salary_to': 20,
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail": "Title should contains only letters",
+            }
+        ),
+        (
+            {
+                'email': 'test_job@test.com',
+                'title': 'TestJob',
+                'description': 'testpass',
+                'salary_from': 10,
+                'salary_to': 10,
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail": "Salary upper limit should be higher than lower limit",
+            }
+        ),
+        (
+            {
+                'title': 'TestJob',
+                'description': 'testpass',
+                'salary_from': 10,
+                'salary_to': 20,
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail": [
+                    {
+                        "loc": ["body", "email"],
+                        "msg": "field required",
+                        "type": "value_error.missing"
+                    }
+                ]
+            }
+        ),
+        (
+            {
+                'email': 'test',
+                'title': 'TestJob',
+                'description': 'testpass',
+                'salary_from': 10,
+                'salary_to': 20,
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail":
+                    [
+                        {
+                            "loc": ["body", "email"],
+                            "msg": "value is not a valid email address",
+                            "type": "value_error.email"
+                        }
+                    ]
+            }
+        ),
+        (
+            {
+                'email': 'test_job@test.com',
+                'title': '',
+                'description': 'testpass',
+                'salary_from': 10,
+                'salary_to': 20,
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail":
+                    [
+                        {
+                            "loc": ["body", "title"],
+                            "msg": "ensure this value has at least 1 characters",
+                            "type": "value_error.any_str.min_length",
+                            "ctx": {
+                                "limit_value": 1
+                            }
+                        }
+                    ]
+                }
+        ),
+    )
+)
+async def test_create_job_fail(company_client, job_data, expected_status_code, expected_detail):
+    resp = await company_client.post('jobs/', json=job_data)
+    assert resp.status_code == expected_status_code
+    assert resp.json() == expected_detail
