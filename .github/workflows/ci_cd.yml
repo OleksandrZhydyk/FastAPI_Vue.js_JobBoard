@@ -15,6 +15,9 @@ jobs:
         matrix:
           os: [ubuntu-latest]
           python-version: ['3.9', '3.10', '3.10.7']
+      defaults:
+        run:
+          working-directory: ./backend
 
       services:
         postgres:
@@ -41,10 +44,8 @@ jobs:
             pipenv install alembic
             pipenv install --dev
         - name: Check migrations
-          working-directory: ./backend
           run: |
             pipenv run alembic upgrade head
         - name: Run tests
-          working-directory: ./backend
           run: |
             pipenv run python -m pytest
