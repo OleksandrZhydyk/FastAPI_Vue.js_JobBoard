@@ -1,4 +1,4 @@
-name: ci_cd parts_online_store
+name: ci_cd fastapi_practic
 
 on:
   - push
