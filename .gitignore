@@ -2,3 +2,4 @@
 test_main.http
 __pycache__
 .env
+.pytest_cache
