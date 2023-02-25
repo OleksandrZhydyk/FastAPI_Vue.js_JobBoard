@@ -41,11 +41,11 @@ jobs:
             python3 -m pip install --upgrade pip
             python3 -m pip install pipenv
             pipenv install
-            pipenv install alembic
             pipenv install --dev
         - name: Check migrations
           run: |
             pipenv run alembic upgrade head
         - name: Run tests
           run: |
+            export PYTHONPATH=$PWD/src
             pipenv run python -m pytest
