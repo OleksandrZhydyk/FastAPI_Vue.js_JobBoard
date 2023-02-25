@@ -42,7 +42,7 @@ jobs:
             pipenv install --dev
         - name: Check migrations
           run: |
-            pipenv run alembic upgrade head
+            pipenv run cd backend/ && alembic upgrade head
         - name: Run tests
           run: |
             pipenv run python -m pytest
