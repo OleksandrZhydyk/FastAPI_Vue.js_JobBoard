@@ -2,7 +2,7 @@ import asyncio
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi_pagination import add_pagination
-from fastapi.middleware.cors import CORSMiddleware 
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -15,7 +15,6 @@ from db.base import init_models, get_session
 
 
 def get_application() -> FastAPI:
-
     app = FastAPI(title="Employment exchange")
 
     @app.on_event("startup")
@@ -32,9 +31,9 @@ def get_application() -> FastAPI:
 
     @app.post("/auth", response_model=Token)
     async def login_for_access_token(
-                                     db: AsyncSession = Depends(get_session),
-                                     form_data: OAuth2PasswordRequestForm = Depends(),
-                                     ) -> Token:
+        db: AsyncSession = Depends(get_session),
+        form_data: OAuth2PasswordRequestForm = Depends(),
+    ) -> Token:
         user = await authenticate_user(db, form_data.username, form_data.password)
         if not user:
             raise HTTPException(
@@ -42,11 +41,17 @@ def get_application() -> FastAPI:
                 detail="Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        access_token = create_access_token(data={"sub": user.email, "scopes": form_data.scopes}, )
-        refresh_token = create_refresh_token(data={"sub": user.email, "scopes": form_data.scopes},)
-        return {"access_token": access_token,
-                "refresh_token": refresh_token,
-                "token_type": "bearer"}
+        access_token = create_access_token(
+            data={"sub": user.email, "scopes": form_data.scopes},
+        )
+        refresh_token = create_refresh_token(
+            data={"sub": user.email, "scopes": form_data.scopes},
+        )
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+        }
 
     app.add_middleware(
         CORSMiddleware,
@@ -62,4 +67,3 @@ def get_application() -> FastAPI:
 
 
 app = get_application()
-

@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import jwt, JWTError
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
+
 # from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from starlette import status
@@ -21,11 +22,15 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth",
-                                     scheme_name="JWT",
-                                     scopes={"auth": "Access all info about current user",
-                                             "company": "Access to create jobs",
-                                             "superuser": "Access all info and actions",})
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/auth",
+    scheme_name="JWT",
+    scopes={
+        "auth": "Access all info about current user",
+        "company": "Access to create jobs",
+        "superuser": "Access all info and actions",
+    },
+)
 
 
 def hash_password(password: str) -> str:
@@ -64,13 +69,17 @@ def create_refresh_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=Config.REFRESH_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, Config.JWT_REFRESH_SECRET_KEY, algorithm=Config.ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, Config.JWT_REFRESH_SECRET_KEY, algorithm=Config.ALGORITHM
+    )
     return encoded_jwt
 
 
-async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme),
-                           db: AsyncSession = Depends(get_session),
-                           ):
+async def get_current_user(
+    security_scopes: SecurityScopes,
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_session),
+):
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     else:
@@ -78,7 +87,7 @@ async def get_current_user(security_scopes: SecurityScopes, token: str = Depends
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": 'authenticate_value'},
+        headers={"WWW-Authenticate": "authenticate_value"},
     )
     try:
         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
@@ -103,20 +112,28 @@ async def get_current_user(security_scopes: SecurityScopes, token: str = Depends
 
 
 async def get_current_active_user(
-    current_user: UserOut = Security(get_current_user, scopes=["auth"])):
+    current_user: UserOut = Security(get_current_user, scopes=["auth"])
+):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
-async def check_company_credentials(user: UserOut = Security(get_current_active_user, scopes=["company"])) -> None:
+async def check_company_credentials(
+    user: UserOut = Security(get_current_active_user, scopes=["company"])
+) -> None:
     if not user.is_company:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized")
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized"
+        )
     return user
 
 
-async def check_superuser_credentials(user: UserOut = Security(get_current_active_user, scopes=['superuser'])) -> None:
+async def check_superuser_credentials(
+    user: UserOut = Security(get_current_active_user, scopes=["superuser"])
+) -> None:
     if not user.is_superuser:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized super")
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED, detail="You are unauthorized super"
+        )
     return user
-

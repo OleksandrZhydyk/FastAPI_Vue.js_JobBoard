@@ -25,6 +25,8 @@ anyio = {extras = ["trio"], version = "*"}
 pytest-asyncio = "*"
 typer = "*"
 fastapi-pagination = "*"
+flake8 = "*"
+black = "*"
 
 [dev-packages]
 

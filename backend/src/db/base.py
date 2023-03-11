@@ -45,5 +45,3 @@ async def get_session() -> AsyncSession:
 #
 #
 # db = AsyncDatabaseSession()
-
-

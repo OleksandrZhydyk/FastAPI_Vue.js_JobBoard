@@ -14,9 +14,6 @@ association_table = Table(
 )
 
 
-
-
-
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
@@ -30,6 +27,6 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     created_jobs = relationship("Job", backref="company_created")
 
-    vacancies = relationship('Job', secondary="association_table", back_populates="appliers")
-    # job = relationship("Job")
-
+    vacancies = relationship(
+        "Job", secondary="association_table", back_populates="appliers"
+    )

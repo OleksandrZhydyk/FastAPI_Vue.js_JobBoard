@@ -3,7 +3,7 @@ import os
 
 from sqlalchemy.dialects.postgresql import insert
 
-os.environ['TESTING'] = 'True'
+os.environ["TESTING"] = "True"
 
 import alembic
 import pytest
@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from httpx import AsyncClient
 
 from db.models.jobs import Job
-from db.base import async_session, engine, Base
+from db.base import async_session
 from schemas.user import UserOut
 from core.security import hash_password, create_access_token
 from db.models.users import User, association_table
@@ -58,7 +58,7 @@ async def create_user(session):
         email="test@test.com",
         name="Test",
         is_active=True,
-        hashed_password=hash_password("testpass")
+        hashed_password=hash_password("testpass"),
     )
     session.add(db_obj)
     await session.commit()
@@ -72,7 +72,7 @@ async def create_company(session):
         name="Test",
         is_company=True,
         is_active=True,
-        hashed_password=hash_password("testpass")
+        hashed_password=hash_password("testpass"),
     )
     session.add(db_obj)
     await session.commit()
@@ -87,7 +87,7 @@ async def create_job(session, create_company):
         description="testpass",
         salary_from=10,
         salary_to=20,
-        user_id=create_company.id
+        user_id=create_company.id,
     )
     session.add(db_obj)
     await session.commit()
@@ -96,7 +96,9 @@ async def create_job(session, create_company):
 
 @pytest.fixture
 async def apply_to_job(session, create_user, create_job):
-    query = insert(association_table).values({'user_id': create_user.id, 'job_id': create_job.id})
+    query = insert(association_table).values(
+        {"user_id": create_user.id, "job_id": create_job.id}
+    )
     await session.execute(query)
     try:
         await session.commit()
@@ -111,7 +113,7 @@ async def create_superuser(session):
         name="Test",
         is_active=True,
         is_superuser=True,
-        hashed_password=hash_password("superuserpass")
+        hashed_password=hash_password("superuserpass"),
     )
     session.add(db_obj)
     await session.commit()
@@ -123,26 +125,32 @@ async def client(app: FastAPI) -> AsyncClient:
     async with AsyncClient(
         app=app,
         base_url="http://localhost",
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json"},
     ) as client:
         yield client
 
 
 @pytest.fixture
 def token(create_user: UserOut) -> str:
-    access_token = create_access_token(data={"sub": create_user.email, "scopes": ["auth"]})
+    access_token = create_access_token(
+        data={"sub": create_user.email, "scopes": ["auth"]}
+    )
     return access_token
 
 
 @pytest.fixture
 def company_token(create_company: UserOut) -> str:
-    access_token = create_access_token(data={"sub": create_company.email, "scopes": ["auth", "company"]})
+    access_token = create_access_token(
+        data={"sub": create_company.email, "scopes": ["auth", "company"]}
+    )
     return access_token
 
 
 @pytest.fixture
 def superuser_token(create_superuser: UserOut) -> str:
-    access_token = create_access_token(data={"sub": create_superuser.email, "scopes": ["auth", "superuser"]})
+    access_token = create_access_token(
+        data={"sub": create_superuser.email, "scopes": ["auth", "superuser"]}
+    )
     return access_token
 
 

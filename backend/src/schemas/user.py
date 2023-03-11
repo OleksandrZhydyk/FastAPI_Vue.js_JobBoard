@@ -1,10 +1,8 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, validator, constr
-
-# from schemas.job import JobOut
 
 
 class UserBase(BaseModel):
@@ -21,9 +19,7 @@ class UserOut(UserBase):
 
     class Config:
         orm_mode = True
-        json_encoders = {
-            datetime: lambda date: str(date)[:-3] + 'Z'
-        }
+        json_encoders = {datetime: lambda date: str(date)[:-3] + "Z"}
 
 
 class UserUpdate(BaseModel):
@@ -34,18 +30,13 @@ class UserUpdate(BaseModel):
 
     class Config:
         orm_mode = True
-        json_encoders = {
-            datetime: lambda date: str(date)[:-3] + 'Z'
-        }
+        json_encoders = {datetime: lambda date: str(date)[:-3] + "Z"}
 
     @validator("name")
     def validate_name(cls, name):
         if name.isalpha():
             return name
-        raise HTTPException(
-            status_code=422, detail="Name should contains only letters"
-        )
-
+        raise HTTPException(status_code=422, detail="Name should contains only letters")
 
 
 class UserCreate(UserBase):
@@ -56,15 +47,14 @@ class UserCreate(UserBase):
     @validator("confirmed_password")
     def match_passwords(cls, password, values, **kwargs):
         if "password" in values and values["password"] != password:
-            raise ValueError("Please enter the same value for password and confirmed password field")
+            raise ValueError(
+                "Please enter the same value for password and confirmed password field"
+            )
         return password
 
     class Config:
         orm_mode = True
 
-
-# class CompanyJobsSchema(UserOut):
-#     jobs: List[JobOut]
 
 class UserInDB(UserOut):
     hashed_password: str

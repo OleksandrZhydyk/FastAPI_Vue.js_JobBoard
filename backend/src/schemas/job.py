@@ -12,30 +12,28 @@ from schemas.user import UserOut
 def check_string_on_numbers(cls, field):
     if not field.isnumeric():
         return field
-    raise HTTPException(
-        status_code=422, detail="Title should contains only letters"
-    )
+    raise HTTPException(status_code=422, detail="Title should contains only letters")
 
 
 def check_salary_upper_limit(cls, field, values):
-    if field > values['salary_from']:
+    if field > values["salary_from"]:
         return field
     raise HTTPException(
-        status_code=422, detail=f"Salary upper limit should be higher than lower limit"
+        status_code=422, detail="Salary upper limit should be higher than lower limit"
     )
 
 
 class JobCategory(str, Enum):
-    finance = 'Finance'
-    marketing = 'Marketing'
-    agro = 'Agriculture'
-    it = 'IT'
-    metallurgy = 'Metallurgy'
-    medicine = 'Medicine'
-    construction = 'Construction'
-    building = 'Building'
-    services = 'Services'
-    miscellaneous = 'Miscellaneous'
+    finance = "Finance"
+    marketing = "Marketing"
+    agro = "Agriculture"
+    it = "IT"
+    metallurgy = "Metallurgy"
+    medicine = "Medicine"
+    construction = "Construction"
+    building = "Building"
+    services = "Services"
+    miscellaneous = "Miscellaneous"
 
 
 class JobCreate(BaseModel):
@@ -45,9 +43,12 @@ class JobCreate(BaseModel):
     salary_from: int = Field(..., gt=0)
     salary_to: int = Field(..., gt=0)
 
-    _check_isalpha = pydantic.validator("title", allow_reuse=True)(check_string_on_numbers)
+    _check_isalpha = pydantic.validator("title", allow_reuse=True)(
+        check_string_on_numbers
+    )
     _check_salary_upper_limit = pydantic.validator("salary_to", allow_reuse=True)(
-        check_salary_upper_limit)
+        check_salary_upper_limit
+    )
 
 
 class JobUpdate(BaseModel):
@@ -57,9 +58,12 @@ class JobUpdate(BaseModel):
     salary_from: Optional[int] = Field(gt=0)
     salary_to: Optional[int] = Field(gt=0)
 
-    _check_isalpha = pydantic.validator("title", allow_reuse=True)(check_string_on_numbers)
+    _check_isalpha = pydantic.validator("title", allow_reuse=True)(
+        check_string_on_numbers
+    )
     _check_salary_upper_limit = pydantic.validator("salary_to", allow_reuse=True)(
-        check_salary_upper_limit)
+        check_salary_upper_limit
+    )
 
 
 class JobOut(JobCreate):
@@ -70,9 +74,7 @@ class JobOut(JobCreate):
 
     class Config:
         orm_mode = True
-        json_encoders = {
-            datetime: lambda date: date.isoformat()[:-3] + 'Z'
-        }
+        json_encoders = {datetime: lambda date: date.isoformat()[:-3] + "Z"}
 
 
 class JobDetail(JobOut):
