@@ -5,6 +5,7 @@ from fastapi import status
 from fastapi import HTTPException
 from fastapi_pagination.ext.async_sqlalchemy import paginate
 from sqlalchemy import delete, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from starlette.status import HTTP_401_UNAUTHORIZED
@@ -34,34 +35,38 @@ class UsersService():
         db.add(db_obj)
         try:
             await db.commit()
-        except Exception:
+        except IntegrityError:
             await db.rollback()
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This email is already registered")
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='This email is already registered')
+        except Exception as err:
+            await db.rollback()
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=f'Database error: {err}')
         return db_obj
 
     async def update(self, obj_in: UserUpdate, user_db: UserOut, db: AsyncSession) -> UserOut:
-        print(obj_in)
         obj_dict = obj_in.dict(exclude_none=True)
-        print(obj_dict)
         obj_dict['updated_at'] = datetime.utcnow()
-        if obj_dict.get("password"):
-            hashed_password = hash_password(obj_dict["password"])
-            del obj_dict["password"]
-            obj_dict["hashed_password"] = hashed_password
+        if obj_dict.get('password'):
+            hashed_password = hash_password(obj_dict['password'])
+            del obj_dict['password']
+            obj_dict['hashed_password'] = hashed_password
         query = update(self.model).where(self.model.id == user_db.id).values(**obj_dict).returning(self.model)
         instance = await db.execute(query)
         try:
             await db.commit()
-        except Exception:
+        except IntegrityError as err:
             await db.rollback()
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect value was entered")
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='This email is already registered')
+        except Exception as err:
+            await db.rollback()
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=f'Database error: {err}')
         return instance.one_or_none()
 
     async def get_all(self, db: AsyncSession) -> List[UserOut]:
         query = select(self.model)
         db_obj = await paginate(db, query)
         if not db_obj:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='There are no objects')
         return db_obj
 
     async def get_company_jobs(self, user_db: UserOut, db: AsyncSession):
@@ -69,7 +74,7 @@ class UsersService():
         db_obj = await db.execute(query)
         instance = db_obj.scalars().all()
         if not instance:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='There are no objects')
         return instance
 
     async def get_one(self, pk: int, db: AsyncSession) -> UserOut:
@@ -77,7 +82,7 @@ class UsersService():
         db_obj = await db.execute(query)
         instance = db_obj.scalar()
         if not instance:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='There is no object')
         return instance
 
     async def delete(self, pk: int, db: AsyncSession) -> bool:
@@ -87,7 +92,7 @@ class UsersService():
             await db.commit()
         except Exception:
             await db.rollback()
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no object to delete")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='There is no object to delete')
         return True
 
 
@@ -102,7 +107,7 @@ class UsersService():
     #     del obj_dict['created_at']
     #     query = update(self.model).where(self.model.id == pk)\
     #         .values(**obj_dict)\
-    #         .execution_options(synchronize_session="fetch")
+    #         .execution_options(synchronize_session='fetch')
     #     await db.execute(query)
     #     try:
     #         await db.commit()
@@ -159,7 +164,7 @@ def get_users_service() -> UsersService:
     #         updated_at=datetime.datetime.utcnow()
     #     )
     #     user_attr_dict = {**user.dict()}
-    #     user_attr_dict.pop("id", None)
+    #     user_attr_dict.pop('id', None)
     #     query = User.insert().values(**user_attr_dict)
     #     user.id = await self.database.execute(query)
     #     return user
@@ -174,8 +179,8 @@ def get_users_service() -> UsersService:
     #         updated_at=datetime.datetime.utcnow()
     #     )
     #     user_attr_dict = {**user.dict()}
-    #     user_attr_dict.pop("id", None)
-    #     user_attr_dict.pop("created_at", None)
+    #     user_attr_dict.pop('id', None)
+    #     user_attr_dict.pop('created_at', None)
     #     query = users.update().where(users.c.id == id).values(**user_attr_dict)
     #     await self.database.execute(query)
     #     return user
