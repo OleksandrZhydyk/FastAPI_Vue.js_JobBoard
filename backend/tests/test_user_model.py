@@ -261,4 +261,4 @@ async def test_update_user(create_user, superuser_client, update_field, update_v
 async def test_delete_user(superuser_client):
     resp = await superuser_client.delete("/users/1")
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() is True
+    assert resp.json() == {'message': True}

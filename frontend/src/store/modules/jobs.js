@@ -48,6 +48,9 @@ export const jobsModule = {
         let {data} = await axios.get(`jobs/${id}/apply`);
         commit('setJobAppliers', data);
       },
+      async deleteJob({}, id) {
+        await axios.delete(`jobs/${id}`);
+      },
     },
   namespaced: true,
 };

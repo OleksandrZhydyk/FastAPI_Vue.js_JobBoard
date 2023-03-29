@@ -8,9 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from starlette import status
+from starlette.responses import JSONResponse
 from starlette.status import HTTP_401_UNAUTHORIZED
 
 from db.models.users import association_table
+from schemas.token import Status
 from schemas.user import UserOut
 from schemas.job import JobCreate, JobOut, JobDetail, JobUpdate
 from db.models.jobs import Job
@@ -108,18 +110,20 @@ class JobsService:
             )
         return True
 
-    async def delete(self, pk: int, db: AsyncSession):
-        query = delete(self.model).where(self.model.id == pk)
-        await db.execute(query)
-        try:
-            await db.commit()
-        except Exception:
-            await db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="There is no object to delete",
-            )
-        return True
+    async def delete(self, pk: int, db: AsyncSession, user_db: UserOut):
+        job = await self.get_one(pk, db)
+        if job.user_id == user_db.id or user_db.is_superuser:
+            query = delete(self.model).where(self.model.id == pk)
+            await db.execute(query)
+            try:
+                await db.commit()
+            except Exception:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="There is no object to delete",
+                )
+            return Status(message=True)
 
     async def get_job_appliers(
         self,

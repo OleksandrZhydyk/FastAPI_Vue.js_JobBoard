@@ -46,7 +46,7 @@ async def test_update_job(company_client, create_job, update_field, update_value
 async def test_delete_job(company_client, create_job):
     resp = await company_client.delete(f"jobs/{create_job.id}")
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() is True
+    assert resp.json() == {'message': True}
 
 
 async def test_get_detail_job(company_client, create_job):

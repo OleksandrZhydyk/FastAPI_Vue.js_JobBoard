@@ -11,7 +11,7 @@ export const usersModule = {
     getters: {
       isAuthenticated: state => !!state.user,
       stateUser: state => state.user,
-      isCompany: state => state.user ? state.user.is_company : false
+      isCompany: state => state.user ? state.user.is_company : false,
     },
 
     mutations: {
@@ -24,6 +24,10 @@ export const usersModule = {
         setMyVacanciesLoadingIndicator(state, bool) {
             state.myVacanciesLoadingIndicator = bool;
             },
+        deleteMyVacancies(state, id) {
+            console.log(id)
+            state.companyVacancies = state.companyVacancies.filter(item => item.id !== id )
+        }
     },
 
     actions: {

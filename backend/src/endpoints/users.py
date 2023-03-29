@@ -11,6 +11,7 @@ from core.security import (
 )
 from db.repositories.users import UsersService, get_users_service
 from schemas.job import JobOut
+from schemas.token import Status
 from schemas.user import UserCreate, UserOut, UserInDB, UserUpdate
 
 router_users = APIRouter()
@@ -80,11 +81,11 @@ async def update_user(
     return await user_service.update(obj_in, current_user, db)
 
 
-@router_users.delete("/{pk}", response_model=bool)
+@router_users.delete("/{pk}", response_model=Status)
 async def delete_user(
     pk: int,
     user_service: UsersService = Depends(get_users_service),
     db: AsyncSession = Depends(get_session),
     current_user: UserInDB = Depends(check_superuser_credentials),
-) -> bool:
-    return await user_service.delete(pk, db)
+) -> Status:
+    return await user_service.delete(pk, db, current_user)

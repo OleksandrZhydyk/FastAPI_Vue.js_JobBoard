@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.base import get_session
 from core.security import check_company_credentials, get_current_active_user
+from schemas.token import Status
 from schemas.user import UserOut
 from db.repositories.jobs import JobsService, get_jobs_service
 from schemas.job import JobCreate, JobOut, JobDetail, JobApplied, JobUpdate, JobCategory
@@ -74,11 +75,11 @@ async def get_job_appliers(
     return await job_service.get_job_appliers(pk, current_user, db)
 
 
-@router_jobs.delete("/{pk}", response_model=bool)
+@router_jobs.delete("/{pk}", response_model=Status)
 async def delete_job(
     pk: int,
     job_service: JobsService = Depends(get_jobs_service),
     db: AsyncSession = Depends(get_session),
     current_user: UserOut = Depends(check_company_credentials),
-) -> bool:
-    return await job_service.delete(pk, db)
+) -> Status:
+    return await job_service.delete(pk, db, current_user)

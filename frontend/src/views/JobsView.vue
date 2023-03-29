@@ -1,5 +1,5 @@
 <template>
-<jobs-list v-if="loadingIndicator" :jobs="jobs.items" :isCompany="isCompany"/>
+<jobs-list v-if="loadingIndicator" :jobs="jobs.items" />
 <div v-else> Loading ... </div>
 </template>
 
@@ -12,9 +12,7 @@ export default {
     components: {
         JobsList
     },
-    data() {
-        return{isCompany: false,}
-    },
+
     methods: {
         ...mapActions({
             getJobs: 'allJobs/getJobs',

@@ -8,6 +8,10 @@ class Login(BaseModel):
     password: str
 
 
+class Status(BaseModel):
+    message: bool
+
+
 class Token(BaseModel):
     access_token: str
     refresh_token: str

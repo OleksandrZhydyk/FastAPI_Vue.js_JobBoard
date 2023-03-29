@@ -8,9 +8,11 @@ from sqlalchemy import delete, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from starlette.responses import JSONResponse
 
 from core.security import hash_password
 from db.models.jobs import Job
+from schemas.token import Status
 from schemas.user import UserCreate, UserOut, UserUpdate
 from db.models.users import User
 
@@ -76,7 +78,7 @@ class UsersService:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail=f"Database error: {err}",
             )
-        return instance.scalar()
+        return instance.scalar_one()
 
     async def get_all(self, db: AsyncSession) -> List[UserOut]:
         query = select(self.model)
@@ -107,18 +109,20 @@ class UsersService:
             )
         return instance
 
-    async def delete(self, pk: int, db: AsyncSession) -> bool:
-        query = delete(self.model).where(self.model.id == pk)
-        await db.execute(query)
-        try:
-            await db.commit()
-        except Exception:
-            await db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="There is no object to delete",
-            )
-        return True
+    async def delete(self, pk: int, db: AsyncSession, user_db: UserOut) -> bool:
+        user = await self.get_one(pk, db)
+        if user.id == user_db.id or user_db.is_superuser:
+            query = delete(self.model).where(self.model.id == pk)
+            await db.execute(query)
+            try:
+                await db.commit()
+            except Exception:
+                await db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="There is no object to delete",
+                )
+            return Status(message=True)
 
 
 def get_users_service() -> UsersService:
