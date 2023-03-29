@@ -1,23 +1,16 @@
 from fastapi import Depends, HTTPException, Security
-from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from fastapi_jwt_auth import AuthJWT
-from jose import jwt, JWTError
-from pydantic import ValidationError
+from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from sqlalchemy.future import select
 from starlette import status
 from starlette.status import HTTP_401_UNAUTHORIZED
 
+
 from schemas.user import UserInDB, UserOut
-from schemas.token import TokenRead
 from db.models.users import User
-
 from db.base import get_session
-from core.config import Config, Settings
-from datetime import datetime, timedelta
 
-from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

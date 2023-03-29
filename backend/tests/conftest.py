@@ -10,7 +10,7 @@ import alembic
 import pytest
 import pytest_asyncio
 from alembic.config import Config
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from httpx import AsyncClient
 
 from db.models.jobs import Job
@@ -134,6 +134,7 @@ async def client(app: FastAPI) -> AsyncClient:
 @pytest.fixture
 def authorize_obj():
     return AuthJWT()
+
 
 @pytest.fixture
 def token(create_user: UserOut, authorize_obj: AuthJWT) -> str:

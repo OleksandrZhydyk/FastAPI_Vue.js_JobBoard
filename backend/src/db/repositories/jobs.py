@@ -43,8 +43,8 @@ class JobsService:
         try:
             await db.commit()
         except Exception as e:
-            await db.rollback()
             print(e)
+            await db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="This email is already registered",
@@ -77,7 +77,7 @@ class JobsService:
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Incorrect value was entered",
                 )
-            return instance.scalar()
+            return instance.scalar_one()
         raise HTTPException(
             status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action"
         )
