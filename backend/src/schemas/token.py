@@ -2,6 +2,9 @@ from typing import List
 
 from pydantic import BaseModel, EmailStr
 
+class Login(BaseModel):
+    username: str
+    password: str
 
 class Token(BaseModel):
     access_token: str

@@ -1,6 +1,7 @@
 import asyncio
 import os
 
+from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.dialects.postgresql import insert
 
 os.environ["TESTING"] = "True"
@@ -9,13 +10,13 @@ import alembic
 import pytest
 import pytest_asyncio
 from alembic.config import Config
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from httpx import AsyncClient
 
 from db.models.jobs import Job
 from db.base import async_session
 from schemas.user import UserOut
-from core.security import hash_password, create_access_token
+from core.security import hash_password
 from db.models.users import User, association_table
 
 
@@ -131,51 +132,52 @@ async def client(app: FastAPI) -> AsyncClient:
 
 
 @pytest.fixture
-def token(create_user: UserOut) -> str:
-    access_token = create_access_token(
-        data={"sub": create_user.email, "scopes": ["auth"]}
-    )
+def authorize_obj():
+    return AuthJWT()
+
+@pytest.fixture
+def token(create_user: UserOut, authorize_obj: AuthJWT) -> str:
+    access_token = authorize_obj.create_access_token(subject=create_user.email)
+    # access_token = create_access_token(
+    #     data={"sub": create_user.email}
+    # )
     return access_token
 
 
 @pytest.fixture
-def company_token(create_company: UserOut) -> str:
-    access_token = create_access_token(
-        data={"sub": create_company.email, "scopes": ["auth", "company"]}
-    )
+def company_token(create_company: UserOut, authorize_obj: AuthJWT) -> str:
+    access_token = authorize_obj.create_access_token(subject=create_company.email)
     return access_token
 
 
 @pytest.fixture
-def superuser_token(create_superuser: UserOut) -> str:
-    access_token = create_access_token(
-        data={"sub": create_superuser.email, "scopes": ["auth", "superuser"]}
-    )
+def superuser_token(create_superuser: UserOut, authorize_obj: AuthJWT) -> str:
+    access_token = authorize_obj.create_access_token(subject=create_superuser.email)
     return access_token
 
 
 @pytest.fixture
 def authorized_client(client: AsyncClient, token: str) -> AsyncClient:
-    client.headers = {
-        "Authorization": f"Bearer {token}",
-        **client.headers,
+    client.cookies = {
+        "access_token_cookie": token,
+        **client.cookies,
     }
     return client
 
 
 @pytest.fixture
 def company_client(client: AsyncClient, company_token: str) -> AsyncClient:
-    client.headers = {
-        "Authorization": f"Bearer {company_token}",
-        **client.headers,
+    client.cookies = {
+        "access_token_cookie": company_token,
+        **client.cookies,
     }
     return client
 
 
 @pytest.fixture
 def superuser_client(client: AsyncClient, superuser_token: str) -> AsyncClient:
-    client.headers = {
-        "Authorization": f"Bearer {superuser_token}",
-        **client.headers,
+    client.cookies = {
+        "access_token_cookie": superuser_token,
+        **client.cookies,
     }
     return client

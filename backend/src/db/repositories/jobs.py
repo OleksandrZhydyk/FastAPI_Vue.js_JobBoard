@@ -77,7 +77,7 @@ class JobsService:
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Incorrect value was entered",
                 )
-            return instance.one_or_none()
+            return instance.scalar()
         raise HTTPException(
             status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action"
         )

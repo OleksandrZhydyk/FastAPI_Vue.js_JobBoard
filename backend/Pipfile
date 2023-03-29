@@ -27,6 +27,7 @@ typer = "*"
 fastapi-pagination = "*"
 flake8 = "*"
 black = "*"
+fastapi-jwt-auth = "*"
 
 [dev-packages]
 
