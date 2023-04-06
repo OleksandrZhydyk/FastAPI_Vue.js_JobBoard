@@ -1,20 +1,21 @@
 from datetime import datetime
 from typing import List
 
+
 from fastapi import HTTPException
 from fastapi_pagination.ext.async_sqlalchemy import paginate
-from sqlalchemy import insert, update, delete
+from sqlalchemy import insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import true
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from starlette import status
-from starlette.responses import JSONResponse
 from starlette.status import HTTP_401_UNAUTHORIZED
 
 from db.models.users import association_table
 from schemas.token import Status
 from schemas.user import UserOut
-from schemas.job import JobCreate, JobOut, JobDetail, JobUpdate
+from schemas.job import JobCreate, JobOut, JobUpdate, JobDetail
 from db.models.jobs import Job
 
 
@@ -28,6 +29,7 @@ class JobsService:
         )
         db_obj = await db.execute(query)
         instance = db_obj.scalar()
+        print(instance.user_id)
         if not instance:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="There is no object"
@@ -85,9 +87,11 @@ class JobsService:
         )
 
     async def get_all(self, db: AsyncSession, job_category) -> List[Job]:
-        query = select(self.model)
+        query = select(self.model).filter(self.model.is_active == true())
         if job_category is not None:
-            query = select(self.model).filter(self.model.category == job_category)
+            query = (select(self.model)
+                     .filter(self.model.category == job_category,
+                             self.model.is_active == true()))
         db_obj = await paginate(db, query)
         if not db_obj:
             raise HTTPException(
@@ -95,7 +99,7 @@ class JobsService:
             )
         return db_obj
 
-    async def apply_to_job(self, job_pk: int, user_db: UserOut, db: AsyncSession):
+    async def apply_to_vacancy(self, job_pk: int, user_db: UserOut, db: AsyncSession):
         query = insert(association_table).values(
             {"user_id": user_db.id, "job_id": job_pk}
         )
@@ -108,12 +112,12 @@ class JobsService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail="This email is already registered",
             )
-        return True
+        return Status(message=True)
 
     async def delete(self, pk: int, db: AsyncSession, user_db: UserOut):
         job = await self.get_one(pk, db)
         if job.user_id == user_db.id or user_db.is_superuser:
-            query = delete(self.model).where(self.model.id == pk)
+            query = update(self.model).where(self.model.id == pk).values(is_active=False)
             await db.execute(query)
             try:
                 await db.commit()
@@ -125,18 +129,18 @@ class JobsService:
                 )
             return Status(message=True)
 
-    async def get_job_appliers(
+    async def get_vacancy_appliers(
         self,
         job_pk: int,
         user_db: UserOut,
         db: AsyncSession,
     ):
-        users_query = (
+        query = (
             select(self.model)
             .where(self.model.id == job_pk)
             .options(joinedload(Job.appliers))
         )
-        db_obj = await db.execute(users_query)
+        db_obj = await db.execute(query)
         instance = db_obj.scalar()
         return instance
 

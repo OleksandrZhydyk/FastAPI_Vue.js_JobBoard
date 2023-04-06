@@ -1,20 +1,15 @@
 <template>
 
-    <div v-for="job in jobs" :key="job.id">
+    <div v-for="vacancy in vacancies" :key="vacancy.id">
         <div class="card mt-3">
           <div class="card-header">
-            {{job.title}}
+            {{vacancy.title}}
           </div>
           <div class="card-body">
-            <h5 class="card-title">{{job.description}}</h5>
-            <p class="card-text">{{job.created}}</p>
-            <p class="card-text">{{job.category}}</p>
-            <a href="#" class="btn btn-outline-primary" v-if="!getAppliers" @click="$router.push(`/jobs/${job.id}`)">Go to</a>
-            <div v-if="getAppliers">
-            <a href="#" class="btn btn-outline-primary" @click="$router.push(`/jobs/${job.id}/appliers`)">Get Appliers</a>
-            <router-link :to="{}" class="btn btn-warning">Edit</router-link>
-            <a href="#" class="btn btn-outline-danger" @click="removeJob(job.id)">Delete Vacancy</a>
-            </div>
+            <h5 class="card-title">{{vacancy.description}}</h5>
+            <p class="card-text">{{vacancy.created}}</p>
+            <p class="card-text">{{vacancy.category}}</p>
+            <a href="#" class="btn btn-primary" @click="$router.push(`/vacancies/${vacancy.id}`)">Go to</a>
           </div>
         </div>
     </div>
@@ -26,7 +21,7 @@ import {mapState, mapGetters, mapActions, mapMutations} from 'vuex';
 
 export default{
     props: {
-        jobs: {
+        vacancies: {
             type: Array,
             required: true,
         },
@@ -38,12 +33,12 @@ export default{
 
     methods: {
     ...mapActions({
-        deleteJob: 'allJobs/deleteJob'
+        deleteVacancy: 'allVacancies/deleteVacancy'
     }),
 
     async removeJob(id){
         try {
-            let {data} = await this.deleteJob(id)
+            let {data} = await this.deleteVacancy(id)
             if (data){
                 this.removeJob(id);
                 };
@@ -53,7 +48,7 @@ export default{
     },
 
     removeJob(id){
-        this.jobs = this.jobs.filter(item => item.id !== id )
+        this.vacancies = this.vacancies.filter(item => item.id !== id )
         },
   },
 

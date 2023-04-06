@@ -139,9 +139,6 @@ def authorize_obj():
 @pytest.fixture
 def token(create_user: UserOut, authorize_obj: AuthJWT) -> str:
     access_token = authorize_obj.create_access_token(subject=create_user.email)
-    # access_token = create_access_token(
-    #     data={"sub": create_user.email}
-    # )
     return access_token
 
 

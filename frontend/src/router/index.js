@@ -1,17 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
-import JobsView from '@/views/JobsView.vue'
-import JobDetailView from '@/views/JobDetailView.vue'
+import VacanciesView from '@/views/VacanciesView.vue'
+import VacancyDetailView from '@/views/VacancyDetailView.vue'
 import CompanyVacancies from '@/views/CompanyVacancies.vue'
 import VacancyAppliers from '@/views/VacancyAppliers.vue'
-import JobUpdate from '@/views/JobUpdate.vue'
+import VacancyUpdate from '@/views/VacancyUpdate.vue'
 import store from '@/store'
 
 const routes = [
   {
     path: '/',
     name: 'main',
-    component: JobsView
+    component: VacanciesView
   },
   {
     path: '/login',
@@ -19,24 +19,24 @@ const routes = [
     component: LoginView
   },
   {
-    path: '/me/jobs',
+    path: '/me/vacancies',
     name: 'companyVacancies',
     component: CompanyVacancies,
     meta: { requiresAuth: true },
   },
   {
-    path: '/jobs/:id',
-    name: 'jobs',
-    component: JobDetailView
+    path: '/vacancies/:id',
+    name: 'vacancies',
+    component: VacancyDetailView
   },
   {
-    path: '/jobs/:id/update',
-    name: 'jobsUpdate',
-    component: JobUpdate,
+    path: '/vacancies/:id/update',
+    name: 'vacanciesUpdate',
+    component: VacancyUpdate,
     meta: { requiresAuth: true },
   },
   {
-    path: '/jobs/:id/appliers',
+    path: '/vacancies/:id/appliers',
     name: 'appliers',
     component: VacancyAppliers,
     meta: { requiresAuth: true },

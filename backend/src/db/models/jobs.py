@@ -24,7 +24,7 @@ class Job(Base):
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     title = Column(String, index=True)
     description = Column(Text)
-    is_active = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, index=True, default=datetime.utcnow)
     updated_at = Column(DateTime, index=True, default=datetime.utcnow)
     salary_from = Column(Integer)

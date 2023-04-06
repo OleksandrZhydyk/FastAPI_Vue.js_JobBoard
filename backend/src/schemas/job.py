@@ -68,6 +68,7 @@ class JobUpdate(BaseModel):
 
 class JobOut(JobCreate):
     id: int
+    is_active: bool
     created_at: datetime
     updated_at: datetime
     category: JobCategory

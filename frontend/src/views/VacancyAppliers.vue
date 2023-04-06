@@ -1,6 +1,44 @@
 <template>
-    <div v-if="jobAppliers">
-        <div v-if="jobAppliers.appliers.length" v-for="applier in jobAppliers.appliers" :key="applier.id">
+
+<div v-if="vacancyAppliers">
+        <div class="row">
+            <div class="col-md">
+                <div class="p-3 py-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-right">Vacancy</h4>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="labels" for="title">Title</label>
+                            <input type="text" id="title" name="title" class="form-control" :value="vacancyAppliers.title" readonly/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels" for="created_at">Published</label>
+                            <input type="text" id="created_at" name="created_at" class="form-control" :value="vacancyAppliers.created_at.substring(0, 10)" readonly/>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="labels" for="salary_from">Salary from</label>
+                            <input type="number" :value="vacancyAppliers.salary_from" min="0" id="salary_from" name="salary_from" class="form-control" readonly/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels" for="salary_up_to">Salary up to</label>
+                            <input type="number" :value="vacancyAppliers.salary_to" min="0" id="salary_up_to" name="salary_to" class="form-control" readonly/>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <label class="labels" for="description">Description</label>
+                            <textarea type="text" :value="vacancyAppliers.description" id="description" name="description" class="form-control" readonly rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div v-if="vacancyAppliers.appliers.length" v-for="applier in vacancyAppliers.appliers" :key="applier.id">
             <div class="card mt-3">
                 <div class="card-header">
                     {{applier.email}}
@@ -9,12 +47,12 @@
                     <h5 class="card-title">{{applier.name}}</h5>
                     <p class="card-text">{{applier.created_at}}</p>
                     <p class="card-text">{{applier.is_active}}</p>
-                    <a href="#" class="btn btn-outline-primary" @click="$router.push(`/jobs/${job.id}`)">Go to</a>
+                    <a href="#" class="btn btn-outline-primary" @click="$router.push(`/vacancies/${vacanciesAppliers.id}`)">Go to</a>
                 </div>
             </div>
         </div>
         <div v-else> No applicants </div>
-    </div>
+</div>
 </template>
 
 <script>
@@ -24,17 +62,17 @@ export default {
 
     methods: {
         ...mapActions({
-            getJobAppliers: 'allJobs/getJobAppliers',
+            getVacancyAppliers: 'allVacancies/getVacancyAppliers',
         }),
     },
 
     computed: {
         ...mapState({
-            jobAppliers: state => state.allJobs.jobAppliers,
+            vacancyAppliers: state => state.allVacancies.vacancyAppliers,
         }),
     },
     created() {
-        this.getJobAppliers(`${this.$route.params.id}`)
+        this.getVacancyAppliers(`${this.$route.params.id}`)
     },
 
 }

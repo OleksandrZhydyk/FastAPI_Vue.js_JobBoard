@@ -1,6 +1,11 @@
 <template>
-<jobs-list v-if="loadingIndicator" :jobs="jobs.items" />
+<div class="row">
+<div class="col-8">
+<h2 class="text-center mt-3">Vacancies</h2>
+<jobs-list v-if="loadingIndicator" :vacancies="vacancies.items" />
 <div v-else> Loading ... </div>
+</div>
+</div>
 </template>
 
 <script>
@@ -8,25 +13,25 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 import JobsList from '@/components/JobsList';
 
 export default {
-    name: "Jobs",
+    name: "Vacancies",
     components: {
         JobsList
     },
 
     methods: {
         ...mapActions({
-            getJobs: 'allJobs/getJobs',
+            getVacancies: 'allVacancies/getVacancies',
         }),
     },
     computed: {
         ...mapState({
-            jobs: state => state.allJobs.jobs,
-            loadingIndicator: state => state.allJobs.jobsLoadingIndicator,
+            vacancies: state => state.allVacancies.vacancies,
+            loadingIndicator: state => state.allVacancies.vacanciesLoadingIndicator,
             user: state => state.allUsers.user,
         }),
     },
     created() {
-        this.getJobs()
+        this.getVacancies()
     },
 
 

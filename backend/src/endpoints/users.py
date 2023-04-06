@@ -12,7 +12,7 @@ from core.security import (
 from db.repositories.users import UsersService, get_users_service
 from schemas.job import JobOut
 from schemas.token import Status
-from schemas.user import UserCreate, UserOut, UserInDB, UserUpdate
+from schemas.user import UserCreate, UserOut, UserInDB, UserUpdate, UserResponse
 
 router_users = APIRouter()
 
@@ -35,12 +35,20 @@ async def get_users(
     return await user_service.get_all(db)
 
 
-@router_users.get("/me", response_model=UserOut)
+@router_users.get("/me", response_model=UserResponse)
 async def get_me(
+    user_service: UsersService = Depends(get_users_service),
+    db: AsyncSession = Depends(get_session),
     current_user: UserOut = Depends(get_current_active_user),
 ):
-    return current_user
+    return await user_service.get_one(current_user.id, db)
 
+
+# @router_users.get("/me/response", response_model=UserResponse)
+# async def user_response_to_vacancy(
+#     current_user: UserOut = Depends(get_current_active_user),
+# ):
+#     return current_user
 
 @router_users.put("/me", response_model=UserOut)
 async def update_me(
@@ -52,13 +60,13 @@ async def update_me(
     return await user_service.update(obj_in, current_user, db)
 
 
-@router_users.get("/me/jobs", response_model=List[JobOut])
+@router_users.get("/me/vacancies", response_model=List[JobOut])
 async def get_company_jobs(
     user_service: UsersService = Depends(get_users_service),
     current_user: UserInDB = Depends(check_company_credentials),
     db: AsyncSession = Depends(get_session),
 ):
-    return await user_service.get_company_jobs(current_user, db)
+    return await user_service.get_company_vacancies(current_user, db)
 
 
 @router_users.get("/{pk}", response_model=UserOut)

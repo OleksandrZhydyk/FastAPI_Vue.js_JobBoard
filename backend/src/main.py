@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from endpoints.auth import router_auth
-from endpoints.jobs import router_jobs
+from endpoints.jobs import router_vacancies
 from endpoints.users import router_users
 from db.base import init_models
 
@@ -20,7 +20,7 @@ def get_application() -> FastAPI:
 
     app.include_router(router_auth, prefix="/auth", tags=["auth"])
     app.include_router(router_users, prefix="/users", tags=["users"])
-    app.include_router(router_jobs, prefix="/jobs", tags=["jobs"])
+    app.include_router(router_vacancies, prefix="/vacancies", tags=["vacancies"])
 
     @app.exception_handler(AuthJWTException)
     def authjwt_exception_handler(request: Request, exc: AuthJWTException):

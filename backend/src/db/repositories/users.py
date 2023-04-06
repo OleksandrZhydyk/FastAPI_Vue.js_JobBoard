@@ -4,11 +4,11 @@ from typing import List
 from fastapi import status
 from fastapi import HTTPException
 from fastapi_pagination.ext.async_sqlalchemy import paginate
-from sqlalchemy import delete, update
+from sqlalchemy import delete, update, true
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from starlette.responses import JSONResponse
+from sqlalchemy.orm import joinedload
 
 from core.security import hash_password
 from db.models.jobs import Job
@@ -89,8 +89,8 @@ class UsersService:
             )
         return db_obj
 
-    async def get_company_jobs(self, user_db: UserOut, db: AsyncSession):
-        query = select(Job).filter(user_db.id == Job.user_id)
+    async def get_company_vacancies(self, user_db: UserOut, db: AsyncSession):
+        query = select(Job).filter(user_db.id == Job.user_id, Job.is_active == true())
         db_obj = await db.execute(query)
         instance = db_obj.scalars().all()
         if not instance:
@@ -100,7 +100,7 @@ class UsersService:
         return instance
 
     async def get_one(self, pk: int, db: AsyncSession) -> UserOut:
-        query = select(self.model).where(self.model.id == pk)
+        query = select(self.model).where(self.model.id == pk).options(joinedload(User.vacancies))
         db_obj = await db.execute(query)
         instance = db_obj.scalar()
         if not instance:
@@ -109,7 +109,7 @@ class UsersService:
             )
         return instance
 
-    async def delete(self, pk: int, db: AsyncSession, user_db: UserOut) -> bool:
+    async def delete(self, pk: int, db: AsyncSession, user_db: UserOut) -> Status:
         user = await self.get_one(pk, db)
         if user.id == user_db.id or user_db.is_superuser:
             query = delete(self.model).where(self.model.id == pk)

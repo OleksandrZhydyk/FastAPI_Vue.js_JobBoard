@@ -10,7 +10,7 @@ async def test_create_job(company_client):
         "salary_from": 10,
         "salary_to": 20,
     }
-    resp = await company_client.post("jobs/", json=job)
+    resp = await company_client.post("vacancies/", json=job)
     assert resp.status_code == status.HTTP_200_OK
     response_data = resp.json()
     assert response_data["email"] == "test_job@test.com"
@@ -21,7 +21,7 @@ async def test_create_job(company_client):
 
 
 async def test_get_all_jobs(authorized_client, create_job):
-    resp = await authorized_client.get("jobs/")
+    resp = await authorized_client.get("vacancies/")
     assert resp.status_code == status.HTTP_200_OK
     response_data = resp.json()
     assert response_data["total"] == 1
@@ -37,35 +37,36 @@ async def test_get_all_jobs(authorized_client, create_job):
 )
 async def test_update_job(company_client, create_job, update_field, update_value):
     resp = await company_client.put(
-        f"jobs/{create_job.id}", json={update_field: update_value}
+        f"vacancies/{create_job.id}", json={update_field: update_value}
     )
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()[update_field] == update_value
 
 
 async def test_delete_job(company_client, create_job):
-    resp = await company_client.delete(f"jobs/{create_job.id}")
+    resp = await company_client.delete(f"vacancies/{create_job.id}")
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {'message': True}
 
 
 async def test_get_detail_job(company_client, create_job):
-    resp = await company_client.get(f"jobs/{create_job.id}")
+    resp = await company_client.get(f"vacancies/{create_job.id}")
     assert resp.status_code == status.HTTP_200_OK
     response_data = resp.json()
+    print(response_data)
     assert response_data["salary_from"] == 10
     assert response_data["category"] == "Miscellaneous"
     assert response_data["user"]["id"] == 1
 
 
 async def test_apply_to_job(authorized_client, create_job):
-    resp = await authorized_client.post(f"jobs/{create_job.id}/apply")
+    resp = await authorized_client.post(f"vacancies/{create_job.id}/apply")
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() is True
+    assert resp.json() == {'message': True}
 
 
 async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
-    resp = await company_client.get(f"jobs/{create_job.id}/apply")
+    resp = await company_client.get(f"vacancies/{create_job.id}/apply")
     assert resp.status_code == status.HTTP_200_OK
     response_data = resp.json()
     assert response_data["email"] == "test_job@test.com"
@@ -164,6 +165,6 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
 async def test_create_job_fail(
     company_client, job_data, expected_status_code, expected_detail
 ):
-    resp = await company_client.post("jobs/", json=job_data)
+    resp = await company_client.post("vacancies/", json=job_data)
     assert resp.status_code == expected_status_code
     assert resp.json() == expected_detail

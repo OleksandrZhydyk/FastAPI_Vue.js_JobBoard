@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, validator, constr
@@ -37,6 +37,10 @@ class UserUpdate(BaseModel):
         if name.isalpha():
             return name
         raise HTTPException(status_code=422, detail="Name should contains only letters")
+
+
+class UserResponse(UserOut):
+    vacancies: Optional[List]
 
 
 class UserCreate(UserBase):

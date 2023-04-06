@@ -10,12 +10,12 @@ from core.security import check_company_credentials, get_current_active_user
 from schemas.token import Status
 from schemas.user import UserOut
 from db.repositories.jobs import JobsService, get_jobs_service
-from schemas.job import JobCreate, JobOut, JobDetail, JobApplied, JobUpdate, JobCategory
+from schemas.job import JobCreate, JobOut, JobApplied, JobUpdate, JobCategory, JobDetail
 
-router_jobs = APIRouter()
+router_vacancies = APIRouter()
 
 
-@router_jobs.post("/", response_model=JobOut)
+@router_vacancies.post("/", response_model=JobOut)
 async def create_job(
     obj_in: JobCreate,
     job_service: JobsService = Depends(get_jobs_service),
@@ -26,8 +26,8 @@ async def create_job(
     return await job_service.create(obj_in, current_user, db, job_category)
 
 
-@router_jobs.get("/", response_model=Page[JobOut])
-async def get_jobs(
+@router_vacancies.get("/", response_model=Page[JobOut])
+async def get_vacancies(
     job_service: JobsService = Depends(get_jobs_service),
     db: AsyncSession = Depends(get_session),
     job_category: JobCategory = None,
@@ -35,26 +35,16 @@ async def get_jobs(
     return await job_service.get_all(db, job_category)
 
 
-@router_jobs.get("/{pk}", response_model=JobDetail)
+@router_vacancies.get("/{pk}", response_model=JobDetail)
 async def get_job(
     pk: int,
     job_service: JobsService = Depends(get_jobs_service),
     db: AsyncSession = Depends(get_session),
-) -> Optional[JobOut]:
+) -> Optional[JobDetail]:
     return await job_service.get_one(pk, db)
 
 
-@router_jobs.post("/{pk}/apply", response_model=bool)
-async def apply_to_job(
-    pk: int,
-    job_service: JobsService = Depends(get_jobs_service),
-    db: AsyncSession = Depends(get_session),
-    current_user: UserOut = Depends(get_current_active_user),
-):
-    return await job_service.apply_to_job(pk, current_user, db)
-
-
-@router_jobs.put("/{pk}", response_model=JobOut)
+@router_vacancies.put("/{pk}", response_model=JobOut)
 async def update_job(
     obj: JobUpdate,
     pk: int,
@@ -65,17 +55,27 @@ async def update_job(
     return await job_service.update(pk, obj, current_user, db)
 
 
-@router_jobs.get("/{pk}/apply", response_model=JobApplied)
-async def get_job_appliers(
+@router_vacancies.post("/{pk}/apply", response_model=Status)
+async def apply_to_job(
     pk: int,
     job_service: JobsService = Depends(get_jobs_service),
     db: AsyncSession = Depends(get_session),
     current_user: UserOut = Depends(get_current_active_user),
 ):
-    return await job_service.get_job_appliers(pk, current_user, db)
+    return await job_service.apply_to_vacancy(pk, current_user, db)
 
 
-@router_jobs.delete("/{pk}", response_model=Status)
+@router_vacancies.get("/{pk}/apply", response_model=JobApplied)
+async def vacancy_appliers(
+    pk: int,
+    job_service: JobsService = Depends(get_jobs_service),
+    db: AsyncSession = Depends(get_session),
+    current_user: UserOut = Depends(check_company_credentials),
+):
+    return await job_service.get_vacancy_appliers(pk, current_user, db)
+
+
+@router_vacancies.delete("/{pk}", response_model=Status)
 async def delete_job(
     pk: int,
     job_service: JobsService = Depends(get_jobs_service),

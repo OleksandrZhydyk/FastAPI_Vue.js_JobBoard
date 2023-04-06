@@ -20,13 +20,16 @@ export const usersModule = {
             },
         setCompanyVacancies(state, vacancies) {
             state.companyVacancies = vacancies;
-            },
+        },
         setMyVacanciesLoadingIndicator(state, bool) {
             state.myVacanciesLoadingIndicator = bool;
-            },
+        },
         deleteMyVacancies(state, id) {
             console.log(id)
             state.companyVacancies = state.companyVacancies.filter(item => item.id !== id )
+        },
+        addAppliedVacancy(state, vacancy){
+            state.user.vacancies.push(vacancy)
         }
     },
 
@@ -45,7 +48,7 @@ export const usersModule = {
       },
       async getMyCompanyVacancies({commit}) {
           try {
-            let res = await axios.get('/users/me/jobs');
+            let res = await axios.get('/users/me/vacancies');
             await commit('setCompanyVacancies', res.data);
           } catch(e) {
             console.log(e)

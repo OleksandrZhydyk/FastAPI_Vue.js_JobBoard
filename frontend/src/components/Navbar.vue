@@ -9,7 +9,7 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
             <a class="nav-link active" aria-current="page" href="#" @click="$router.push('/')">Vacancies</a>
-            <a class="nav-link active" href="#" v-if="isCompany" @click="$router.push('/me/jobs')">My vacancies</a>
+            <a class="nav-link active" href="#" v-if="isCompany" @click="$router.push('/me/vacancies')">My vacancies</a>
           </div>
         </div>
         <form class="d-flex" role="search">
