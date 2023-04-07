@@ -12,8 +12,7 @@
                             <input type="text" id="title" name="title" class="form-control" :value="vacancy.title" readonly/>
                         </div>
                         <div class="col-md-6">
-                            <label class="labels" for="created_at">Published</label>
-                            <input type="text" id="created_at" name="created_at" class="form-control" :value="vacancy.created_at.substring(0, 10)" readonly/>
+                            <span class="float-end">Published: {{vacancy.created_at.substring(0, 10)}}</span>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -38,7 +37,7 @@
                    <button type="button" v-if="isLoggedIn && applied" class="btn btn-warning mt-4">Applied</button>
                    <DialogLogin v-if="!isLoggedIn" />
 
-                    <ModalError ref="error" />
+                    <ModalError :modal="modal" :error="error" />
                 </div>
             </div>
         </div>
@@ -52,6 +51,12 @@ import ModalError from '@/components/ModalError';
 
 export default {
     name: "JobDetail",
+    data() {
+        return {
+            modal: false,
+            error: false,
+        }
+    },
     components: {
         DialogLogin,
         ModalError
@@ -71,7 +76,8 @@ export default {
                 if (res === true){
                     await this.addAppliedVacancy(this.vacancy)
                 } else {
-                    this.$refs.error.click();
+                    this.modal = true,
+                    this.error = true
                 }
             } catch(e){
                 console.log(e);

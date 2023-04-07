@@ -3,12 +3,12 @@
     <div v-for="vacancy in vacancies" :key="vacancy.id">
         <div class="card mt-3">
           <div class="card-header">
-            {{vacancy.title}}
+            <span>{{vacancy.category}}</span>
+            <span class="float-end">Published: {{vacancy.created_at.substring(0, 10)}}</span>
           </div>
           <div class="card-body">
-            <h5 class="card-title">{{vacancy.description}}</h5>
-            <p class="card-text">{{vacancy.created}}</p>
-            <p class="card-text">{{vacancy.category}}</p>
+            <h5 class="card-title">{{vacancy.title}}</h5>
+            <p class="card-text">{{vacancy.description}}</p>
             <a href="#" class="btn btn-primary" @click="$router.push(`/vacancies/${vacancy.id}`)">Go to</a>
           </div>
         </div>

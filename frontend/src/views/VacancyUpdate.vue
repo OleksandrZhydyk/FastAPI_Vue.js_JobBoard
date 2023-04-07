@@ -1,5 +1,5 @@
 <template>
-    <form v-if="vacancy" method="POST">
+    <form v-if="vacancy" method="POST" style="overflow: hidden;">
         <div class="row">
             <div class="col-md">
                 <div class="p-3 py-5">
@@ -10,6 +10,9 @@
                         <div class="col-md-6">
                             <label class="labels" for="title">Title</label>
                             <input type="text" id="title" name="title" class="form-control" v-model="vacancy.title" required="true"/>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="float-end">Updated: {{vacancy.updated_at.substring(0, 10)}}</span>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -32,8 +35,8 @@
                 </div>
             </div>
         </div>
+        <modal-error v-if="updated" :updated="updated" :error="error" :modal="modal"/>
     </form>
-<ModalError/>
 </template>
 
 <script>
@@ -44,6 +47,9 @@ export default {
     data() {
         return {
             vacancy: null,
+            modal: false,
+            updated: false,
+            error: false,
         }
     },
     components: {
@@ -63,7 +69,14 @@ export default {
               "salary_from": vacancy.salary_from.toString(),
               "salary_to": vacancy.salary_to.toString()
             }
-                let res = this.updateVacancy(data)
+                let res = await this.updateVacancy(data)
+                if (res === true){
+                    this.modal = true,
+                    this.updated = true
+                } else {
+                    this.modal = true,
+                    this.error = true
+                }
             } catch(e){
                 console.log(e);
             }

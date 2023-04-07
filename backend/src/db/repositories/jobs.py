@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 
 from fastapi import HTTPException
@@ -86,11 +85,12 @@ class JobsService:
             status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action"
         )
 
-    async def get_all(self, db: AsyncSession, job_category) -> List[Job]:
+    async def get_all(self, db: AsyncSession, job_categories):
         query = select(self.model).filter(self.model.is_active == true())
-        if job_category is not None:
+        print(job_categories)
+        if job_categories is not None:
             query = (select(self.model)
-                     .filter(self.model.category == job_category,
+                     .filter(self.model.category.in_([*job_categories]),
                              self.model.is_active == true()))
         db_obj = await paginate(db, query)
         if not db_obj:

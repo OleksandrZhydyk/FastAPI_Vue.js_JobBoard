@@ -1,16 +1,16 @@
-from typing import Optional
-
+from typing import Optional, List
 from fastapi import APIRouter, Depends
-from fastapi_pagination import Page
+from fastapi.params import Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-from db.base import get_session
 from core.security import check_company_credentials, get_current_active_user
+from db.base import get_session
+from db.repositories.jobs import JobsService, get_jobs_service
+from schemas.custom_page import Page
+from schemas.job import JobCreate, JobOut, JobApplied, JobUpdate, JobCategory, JobDetail
 from schemas.token import Status
 from schemas.user import UserOut
-from db.repositories.jobs import JobsService, get_jobs_service
-from schemas.job import JobCreate, JobOut, JobApplied, JobUpdate, JobCategory, JobDetail
+
 
 router_vacancies = APIRouter()
 
@@ -30,9 +30,10 @@ async def create_job(
 async def get_vacancies(
     job_service: JobsService = Depends(get_jobs_service),
     db: AsyncSession = Depends(get_session),
-    job_category: JobCategory = None,
+    job_categories: List[JobCategory] = Query(None)
+    # job_categories: JobCategory = None,
 ):
-    return await job_service.get_all(db, job_category)
+    return await job_service.get_all(db, job_categories)
 
 
 @router_vacancies.get("/{pk}", response_model=JobDetail)

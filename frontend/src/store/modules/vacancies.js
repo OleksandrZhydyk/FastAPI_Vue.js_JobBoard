@@ -6,6 +6,8 @@ export const vacanciesModule = {
           vacanciesLoadingIndicator: false,
           vacancy: null,
           vacancyAppliers: null,
+          allPages: 0,
+          categories: null,
          }
     ),
 
@@ -26,14 +28,29 @@ export const vacanciesModule = {
         },
         setVacancyAppliers(state, appliers){
             state.vacancyAppliers = appliers
-        }
+        },
+        setAllPages(state, pages){
+            state.allPages = pages;
+        },
+        setAllCategories(state, categories){
+            state.categories = categories;
+        },
     },
 
     actions: {
-      async getVacancies({commit}) {
+      async getVacancies({commit}, params) {
         try {
-            let {data} = await axios.get('vacancies/');
+            let {data} = await axios.get('vacancies/',
+                {
+                    params: params,
+                    paramsSerializer: {
+                        indexes: null
+                    },
+                    }
+                );
             commit('setVacancies', data);
+            commit('setAllPages', data.pages);
+            commit('setAllCategories', data.categories);
         } catch(e) {
             console.log(e)
         } finally {
@@ -47,20 +64,19 @@ export const vacanciesModule = {
 
       async getVacancyAppliers({commit}, id) {
         let {data} = await axios.get(`vacancies/${id}/apply`);
-        console.log(data)
         commit('setVacancyAppliers', data);
       },
       async updateVacancy(vuexContext, data) {
         const {id, ...params} = data
         let res = await axios.put(`vacancies/${id}`, params);
-        if (res.status_code !== 200) {
+        if (res.status !== 200) {
             return false
         }
         return true
       },
       async deleteVacancy({}, id) {
         let res = await axios.delete(`vacancies/${id}`);
-        if (res.status_code !== 200) {
+        if (res.status !== 200) {
             return false
         }
         return true

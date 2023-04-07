@@ -13,8 +13,7 @@
                             <input type="text" id="title" name="title" class="form-control" :value="vacancyAppliers.title" readonly/>
                         </div>
                         <div class="col-md-6">
-                            <label class="labels" for="created_at">Published</label>
-                            <input type="text" id="created_at" name="created_at" class="form-control" :value="vacancyAppliers.created_at.substring(0, 10)" readonly/>
+                            <span class="float-end">Published: {{vacancyAppliers.created_at.substring(0, 10)}}</span>
                         </div>
                     </div>
                     <div class="row mt-2">
