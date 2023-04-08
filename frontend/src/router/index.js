@@ -5,6 +5,9 @@ import VacancyDetailView from '@/views/VacancyDetailView.vue'
 import CompanyVacancies from '@/views/CompanyVacancies.vue'
 import VacancyAppliers from '@/views/VacancyAppliers.vue'
 import VacancyUpdate from '@/views/VacancyUpdate.vue'
+import CreateVacancy from '@/views/CreateVacancy.vue'
+import ArchivedVacancies from '@/views/ArchivedVacancies.vue'
+import ApplicantProfile from '@/views/ApplicantProfile.vue'
 import store from '@/store'
 
 const routes = [
@@ -19,9 +22,27 @@ const routes = [
     component: LoginView
   },
   {
+    path: '/users/profile/:id',
+    name: 'applicantProfile',
+    component: ApplicantProfile,
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/me/vacancies',
     name: 'companyVacancies',
     component: CompanyVacancies,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/me/vacancies/archive',
+    name: 'archivedVacancies',
+    component: ArchivedVacancies,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/vacancies/create',
+    name: 'createVacancy',
+    component: CreateVacancy,
     meta: { requiresAuth: true },
   },
   {

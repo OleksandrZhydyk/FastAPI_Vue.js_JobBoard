@@ -8,6 +8,7 @@ export const vacanciesModule = {
           vacancyAppliers: null,
           allPages: 0,
           categories: null,
+          objOnPage: 5,
          }
     ),
 
@@ -46,8 +47,7 @@ export const vacanciesModule = {
                     paramsSerializer: {
                         indexes: null
                     },
-                    }
-                );
+                });
             commit('setVacancies', data);
             commit('setAllPages', data.pages);
             commit('setAllCategories', data.categories);
@@ -65,6 +65,13 @@ export const vacanciesModule = {
       async getVacancyAppliers({commit}, id) {
         let {data} = await axios.get(`vacancies/${id}/apply`);
         commit('setVacancyAppliers', data);
+      },
+      async createVacancy(vuexContext, payload) {
+        let res = await axios.post('vacancies/', payload);
+        if (res.status !== 200) {
+            return false
+        }
+        return true
       },
       async updateVacancy(vuexContext, data) {
         const {id, ...params} = data

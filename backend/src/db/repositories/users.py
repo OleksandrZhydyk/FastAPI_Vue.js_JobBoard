@@ -4,7 +4,7 @@ from typing import List
 from fastapi import status
 from fastapi import HTTPException
 from fastapi_pagination.ext.async_sqlalchemy import paginate
-from sqlalchemy import delete, update, true
+from sqlalchemy import delete, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -90,7 +90,7 @@ class UsersService:
         return db_obj
 
     async def get_company_vacancies(self, user_db: UserOut, db: AsyncSession):
-        query = select(Job).filter(user_db.id == Job.user_id, Job.is_active == true())
+        query = select(Job).filter(user_db.id == Job.user_id).order_by(Job.updated_at.desc())
         db_obj = await db.execute(query)
         instance = db_obj.scalars().all()
         if not instance:
@@ -99,18 +99,23 @@ class UsersService:
             )
         return instance
 
-    async def get_one(self, pk: int, db: AsyncSession) -> UserOut:
-        query = select(self.model).where(self.model.id == pk).options(joinedload(User.vacancies))
-        db_obj = await db.execute(query)
-        instance = db_obj.scalar()
-        if not instance:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="There is no object"
-            )
-        return instance
+    async def get_one(self, pk: int, user_db: UserOut, db: AsyncSession) -> UserOut:
+        if user_db.is_company or user_db.is_superuser or user_db.id == pk:
+            query = select(self.model).where(self.model.id == pk).options(joinedload(User.vacancies))
+            db_obj = await db.execute(query)
+            instance = db_obj.scalar()
+            if not instance:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="There is no object"
+                )
+            return instance
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions",
+        )
 
-    async def delete(self, pk: int, db: AsyncSession, user_db: UserOut) -> Status:
-        user = await self.get_one(pk, db)
+    async def delete(self, pk: int, user_db: UserOut, db: AsyncSession,) -> Status:
+        user = await self.get_one(pk, user_db, db)
         if user.id == user_db.id or user_db.is_superuser:
             query = delete(self.model).where(self.model.id == pk)
             await db.execute(query)
@@ -123,6 +128,10 @@ class UsersService:
                     detail="There is no object to delete",
                 )
             return Status(message=True)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions",
+        )
 
 
 def get_users_service() -> UsersService:

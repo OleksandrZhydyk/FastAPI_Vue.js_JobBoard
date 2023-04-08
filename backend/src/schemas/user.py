@@ -14,6 +14,7 @@ class UserOut(UserBase):
     id: int
     is_company: bool
     is_active: bool
+    is_superuser: bool
     created_at: datetime
     updated_at: datetime
 

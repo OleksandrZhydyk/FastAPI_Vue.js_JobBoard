@@ -28,5 +28,5 @@ class User(Base):
     created_jobs = relationship("Job", backref="company_created")
 
     vacancies = relationship(
-        "Job", secondary=association_table, back_populates="appliers"
+        "Job", secondary=association_table, back_populates="appliers", order_by="Job.created_at"
     )

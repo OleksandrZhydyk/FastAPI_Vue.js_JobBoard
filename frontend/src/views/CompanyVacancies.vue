@@ -1,26 +1,34 @@
 <template>
+<div class="row mt-2">
+    <div class="col-8 mt-3">
+        <h3 class="text-left">Published vacancies</h3>
+    </div>
+    <div class="col-4 mt-3">
+        <router-link class="btn btn-success float-end" :to="{name: 'createVacancy'}">Create Vacancy</router-link>
+    </div>
+</div>
+
 <div class="row">
-<div class="col-8">
-<h2 class="text-center mt-3">Your published vacancies</h2>
-<div v-if="loadingIndicator" v-for="vacancy in companyVacancies" :key="vacancy.id">
-        <div class="card mt-3">
-          <div class="card-header">
-            {{vacancy.title}}
-          </div>
-          <div class="card-body">
-            <h5 class="card-title">{{vacancy.description}}</h5>
-            <p class="card-text">{{vacancy.created}}</p>
-            <p class="card-text">{{vacancy.category}}</p>
-            <a href="#" class="btn btn-primary" @click="$router.push(`/vacancies/${vacancy.id}/appliers`)">Get Appliers</a>
-            <a href="#" class="btn btn-danger float-end" @click="removeJob(vacancy.id)">Delete Vacancy</a>
-            <router-link class="btn btn-warning float-end me-2" :to="{name: 'vacanciesUpdate', params: { id: vacancy.id }, query: { ...vacancy }}">Edit</router-link>
-            <!-- <a href="#" class="btn btn-warning float-end me-2" @click="$router.push(`/vacancies/${vacancy.id}/update`, params: { vacancy })">Edit</a> -->
-          </div>
+    <div class="col">
+        <div v-if="loadingIndicator" v-for="vacancy in activeVacancies" :key="vacancy.id">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <span>{{vacancy.title}}</span>
+                    <span class="float-end">Updated: {{vacancy.updated_at.substring(0, 10)}}</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{vacancy.category}}</p>
+                    <h5 class="card-title">{{vacancy.description}}</h5>
+                    <a href="#" class="btn btn-primary" @click="$router.push(`/vacancies/${vacancy.id}/appliers`)">Get Appliers</a>
+                    <a href="#" class="btn btn-danger float-end" @click="removeJob(vacancy.id)">Deactivate</a>
+                    <router-link class="btn btn-warning float-end me-2" :to="{name: 'vacanciesUpdate', params: { id: vacancy.id }, query: { ...vacancy }}">Edit</router-link>
+                    <!-- <a href="#" class="btn btn-warning float-end me-2" @click="$router.push(`/vacancies/${vacancy.id}/update`, params: { vacancy })">Edit</a> -->
+                </div>
+            </div>
         </div>
-      </div>
-    <div v-else> Loading ... </div>
+        <div v-else> Loading ... </div>
     </div>
-    </div>
+</div>
 </template>
 
 <script>
@@ -52,7 +60,11 @@ export default {
         ...mapState({
             companyVacancies: state => state.allUsers.companyVacancies,
             loadingIndicator: state => state.allUsers.myVacanciesLoadingIndicator,
+            objOnPage: state => state.allVacancies.objOnPage,
         }),
+        activeVacancies(){
+            return [...this.companyVacancies].filter((vacancy) => vacancy.is_active)
+        }
     },
     created() {
         this.getMyCompanyVacancies()

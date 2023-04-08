@@ -41,14 +41,8 @@ async def get_me(
     db: AsyncSession = Depends(get_session),
     current_user: UserOut = Depends(get_current_active_user),
 ):
-    return await user_service.get_one(current_user.id, db)
+    return await user_service.get_one(current_user.id, current_user, db)
 
-
-# @router_users.get("/me/response", response_model=UserResponse)
-# async def user_response_to_vacancy(
-#     current_user: UserOut = Depends(get_current_active_user),
-# ):
-#     return current_user
 
 @router_users.put("/me", response_model=UserOut)
 async def update_me(
@@ -73,10 +67,10 @@ async def get_company_jobs(
 async def get_one(
     pk: int,
     user_service: UsersService = Depends(get_users_service),
-    current_user: UserInDB = Depends(check_superuser_credentials),
+    current_user: UserInDB = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_session),
 ):
-    return await user_service.get_one(pk, db)
+    return await user_service.get_one(pk, current_user, db)
 
 
 @router_users.put("/{pk}", response_model=UserUpdate)
@@ -96,4 +90,4 @@ async def delete_user(
     db: AsyncSession = Depends(get_session),
     current_user: UserInDB = Depends(check_superuser_credentials),
 ) -> Status:
-    return await user_service.delete(pk, db, current_user)
+    return await user_service.delete(pk, current_user, db)

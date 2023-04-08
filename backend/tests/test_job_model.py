@@ -9,6 +9,7 @@ async def test_create_job(company_client):
         "description": "testpass",
         "salary_from": 10,
         "salary_to": 20,
+        "category": "Agriculture"
     }
     resp = await company_client.post("vacancies/", json=job)
     assert resp.status_code == status.HTTP_200_OK
@@ -53,7 +54,6 @@ async def test_get_detail_job(company_client, create_job):
     resp = await company_client.get(f"vacancies/{create_job.id}")
     assert resp.status_code == status.HTTP_200_OK
     response_data = resp.json()
-    print(response_data)
     assert response_data["salary_from"] == 10
     assert response_data["category"] == "Miscellaneous"
     assert response_data["user"]["id"] == 1
@@ -84,6 +84,7 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
                 "description": "testpass",
                 "salary_from": 10,
                 "salary_to": 20,
+                "category": "Agriculture"
             },
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             {
@@ -97,6 +98,7 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
                 "description": "testpass",
                 "salary_from": 10,
                 "salary_to": 10,
+                "category": "Agriculture"
             },
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             {
@@ -109,6 +111,7 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
                 "description": "testpass",
                 "salary_from": 10,
                 "salary_to": 20,
+                "category": "Agriculture"
             },
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             {
@@ -128,6 +131,7 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
                 "description": "testpass",
                 "salary_from": 10,
                 "salary_to": 20,
+                "category": "Agriculture"
             },
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             {
@@ -147,6 +151,7 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
                 "description": "testpass",
                 "salary_from": 10,
                 "salary_to": 20,
+                "category": "Agriculture"
             },
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             {
@@ -156,6 +161,37 @@ async def test_get_appliers_to_job(company_client, apply_to_job, create_job):
                         "msg": "ensure this value has at least 1 characters",
                         "type": "value_error.any_str.min_length",
                         "ctx": {"limit_value": 1},
+                    }
+                ]
+            },
+        ),
+        (
+            {
+                "email": "test_job@test.com",
+                "title": "title",
+                "description": "testpass",
+                "salary_from": 10,
+                "salary_to": 20,
+                "category": "Incorrect_category"
+            },
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            {
+                "detail": [
+                    {
+                        'ctx': {
+                            'enum_values':
+                            [
+                                'Finance', 'Marketing', 'Agriculture',
+                                'IT', 'Metallurgy', 'Medicine', 'Construction', 'Building',
+                                'Services', 'Miscellaneous'
+                            ]
+                        },
+                        'loc': ['body', 'category'],
+                        'msg': 'value is not a valid enumeration member; permitted: '
+                        "'Finance', 'Marketing', 'Agriculture', 'IT', "
+                        "'Metallurgy', 'Medicine', 'Construction', 'Building', "
+                        "'Services', 'Miscellaneous'",
+                        'type': 'type_error.enum'
                     }
                 ]
             },

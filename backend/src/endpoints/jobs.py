@@ -21,9 +21,8 @@ async def create_job(
     job_service: JobsService = Depends(get_jobs_service),
     current_user: UserOut = Depends(check_company_credentials),
     db: AsyncSession = Depends(get_session),
-    job_category: JobCategory = JobCategory.miscellaneous,
 ):
-    return await job_service.create(obj_in, current_user, db, job_category)
+    return await job_service.create(obj_in, current_user, db)
 
 
 @router_vacancies.get("/", response_model=Page[JobOut])

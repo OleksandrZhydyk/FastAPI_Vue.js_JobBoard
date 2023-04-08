@@ -9,7 +9,7 @@ from sqlalchemy.sql.expression import true
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from starlette import status
-from starlette.status import HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_403_FORBIDDEN
 
 from db.models.users import association_table
 from schemas.token import Status
@@ -36,10 +36,9 @@ class JobsService:
         return instance
 
     async def create(
-        self, obj_in: JobCreate, user_db: UserOut, db: AsyncSession, job_category
+        self, obj_in: JobCreate, user_db: UserOut, db: AsyncSession
     ) -> JobOut:
         obj_dict = obj_in.dict()
-        obj_dict["category"] = job_category
         obj_dict["user_id"] = user_db.id
         instance = self.model(**obj_dict)
         db.add(instance)
@@ -82,22 +81,21 @@ class JobsService:
                 )
             return instance.scalar_one()
         raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized for this action"
+            status_code=HTTP_403_FORBIDDEN, detail="Not enough permissions"
         )
 
     async def get_all(self, db: AsyncSession, job_categories):
-        query = select(self.model).filter(self.model.is_active == true())
-        print(job_categories)
+        query = select(self.model).filter(self.model.is_active == true()).order_by(self.model.created_at.desc())
         if job_categories is not None:
             query = (select(self.model)
                      .filter(self.model.category.in_([*job_categories]),
-                             self.model.is_active == true()))
-        db_obj = await paginate(db, query)
-        if not db_obj:
+                             self.model.is_active == true()).order_by(self.model.created_at.desc()))
+        instance = await paginate(db, query)
+        if not instance:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects"
             )
-        return db_obj
+        return instance
 
     async def apply_to_vacancy(self, job_pk: int, user_db: UserOut, db: AsyncSession):
         query = insert(association_table).values(
@@ -128,6 +126,9 @@ class JobsService:
                     detail="There is no object to delete",
                 )
             return Status(message=True)
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail="Not enough permissions"
+        )
 
     async def get_vacancy_appliers(
         self,

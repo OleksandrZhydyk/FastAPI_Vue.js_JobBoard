@@ -16,13 +16,21 @@
                         </div>
                     </div>
                     <div class="row mt-2">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="labels" for="salary_from">Salary from</label>
                             <input type="number" :value="vacancy.salary_from" min="0" id="salary_from" name="salary_from" class="form-control" readonly/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="labels" for="salary_up_to">Salary up to</label>
                             <input type="number" :value="vacancy.salary_to" min="0" id="salary_up_to" name="salary_to" class="form-control" readonly/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="labels" for="category">Category</label>
+                            <input type="text" :value="vacancy.category" min="0" id="category" name="category" class="form-control" readonly/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="labels" for="email">Email</label>
+                            <input type="text" :value="vacancy.email" min="0" id="email" name="email" class="form-control" readonly/>
                         </div>
                     </div>
                     <div class="row mt-2">

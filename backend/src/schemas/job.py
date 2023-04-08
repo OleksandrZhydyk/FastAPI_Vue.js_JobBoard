@@ -42,6 +42,7 @@ class JobCreate(BaseModel):
     description: constr(min_length=1)
     salary_from: int = Field(..., gt=0)
     salary_to: int = Field(..., gt=0)
+    category: JobCategory
 
     _check_isalpha = pydantic.validator("title", allow_reuse=True)(
         check_string_on_numbers
@@ -71,7 +72,6 @@ class JobOut(JobCreate):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-    category: JobCategory
 
     class Config:
         orm_mode = True

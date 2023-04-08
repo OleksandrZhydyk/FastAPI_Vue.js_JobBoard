@@ -44,59 +44,6 @@ async def authenticate_user(database, email: str, password: str):
     return user
 
 
-# def create_access_token(data: dict) -> str:
-#     to_encode = data.copy()
-#     expire = datetime.utcnow() + timedelta(minutes=Config.ACCESS_TOKEN_EXPIRE_MINUTES)
-#     to_encode.update({"exp": expire})
-#     encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm=Config.ALGORITHM)
-#     return encoded_jwt
-
-
-# def create_refresh_token(data: dict) -> str:
-#     to_encode = data.copy()
-#     expire = datetime.utcnow() + timedelta(minutes=Config.REFRESH_TOKEN_EXPIRE_MINUTES)
-#     to_encode.update({"exp": expire})
-#     encoded_jwt = jwt.encode(
-#         to_encode, Config.JWT_REFRESH_SECRET_KEY, algorithm=Config.ALGORITHM
-#     )
-#     return encoded_jwt
-
-
-# async def get_current_user(
-#     security_scopes: SecurityScopes,
-#     token: str = Depends(oauth2_scheme),
-#     db: AsyncSession = Depends(get_session),
-# ):
-#     if security_scopes.scopes:
-#         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
-#     else:
-#         authenticate_value = "Bearer"
-#     credentials_exception = HTTPException(
-#         status_code=status.HTTP_401_UNAUTHORIZED,
-#         detail="Could not validate credentials",
-#         headers={"WWW-Authenticate": "authenticate_value"},
-#     )
-#     try:
-#         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
-#         email: str = payload.get("sub")
-#         if email is None:
-#             raise credentials_exception
-#         token_scopes = payload.get("scopes", [])
-#         token_data = TokenRead(scopes=token_scopes, email=email)
-#     except (JWTError, ValidationError):
-#         raise credentials_exception
-#     user = await get_user(db, email=token_data.email)
-#     if user is None:
-#         raise credentials_exception
-#     for scope in security_scopes.scopes:
-#         if scope not in token_data.scopes:
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail="Not enough permissions",
-#                 headers={"WWW-Authenticate": authenticate_value},
-#             )
-#     return user
-
 async def get_current_user(
     db: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends()

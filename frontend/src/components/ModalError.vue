@@ -9,6 +9,7 @@
       </div> -->
       <div class="modal-body">
         <p v-if="updated" class="text-center fs-3">Vacancy updated successfully</p>
+        <p v-if="created" class="text-center fs-3">Vacancy created successfully</p>
         <p v-if="error" class="text-center fs-3">Error occurred</p>
       </div>
       <div class="modal-footer">
@@ -24,6 +25,10 @@
 export default{
 
     props: {
+        created: {
+            type: Boolean,
+            value: false,
+        },
         updated: {
             type: Boolean,
             value: false,

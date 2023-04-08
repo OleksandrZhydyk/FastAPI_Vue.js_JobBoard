@@ -5,6 +5,7 @@ export const usersModule = {
         { user: null,
           companyVacancies: [],
           myVacanciesLoadingIndicator: false,
+          applicant: null,
          }
     ),
 
@@ -25,11 +26,13 @@ export const usersModule = {
             state.myVacanciesLoadingIndicator = bool;
         },
         deleteMyVacancies(state, id) {
-            console.log(id)
             state.companyVacancies = state.companyVacancies.filter(item => item.id !== id )
         },
         addAppliedVacancy(state, vacancy){
             state.user.vacancies.push(vacancy)
+        },
+        setApplicant(state, applicant){
+            state.applicant = applicant
         }
     },
 
@@ -55,6 +58,10 @@ export const usersModule = {
           } finally {
             commit('setMyVacanciesLoadingIndicator', true);
           }
+      },
+      async getUser({commit}, id) {
+        let {data} = await axios.get(`/users/${id}`);
+        await commit('setApplicant', data);
       },
 
       async logOut({commit}){

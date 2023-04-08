@@ -155,6 +155,7 @@ async def test_get_me(authorized_client):
 
 async def test_get_user(create_user, superuser_client):
     resp = await superuser_client.get("/users/1")
+    print(resp.json())
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["email"] == "test@test.com"
     assert resp.json()["name"] == "Test"
@@ -164,7 +165,7 @@ async def test_get_user(create_user, superuser_client):
 
 async def test_user_access_to_another_user(authorized_client, create_superuser):
     resp = await authorized_client.get("/users/2")
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
 async def test_user_update_of_another_user(authorized_client, create_superuser):

@@ -17,13 +17,21 @@
                         </div>
                     </div>
                     <div class="row mt-2">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="labels" for="salary_from">Salary from</label>
                             <input type="number" :value="vacancyAppliers.salary_from" min="0" id="salary_from" name="salary_from" class="form-control" readonly/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="labels" for="salary_up_to">Salary up to</label>
                             <input type="number" :value="vacancyAppliers.salary_to" min="0" id="salary_up_to" name="salary_to" class="form-control" readonly/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="labels" for="category">Category</label>
+                            <input type="text" :value="vacancyAppliers.category" min="0" id="category" name="category" class="form-control" readonly/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="labels" for="email">Email</label>
+                            <input type="text" :value="vacancyAppliers.email" min="0" id="email" name="email" class="form-control" readonly/>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -46,7 +54,7 @@
                     <h5 class="card-title">{{applier.name}}</h5>
                     <p class="card-text">{{applier.created_at}}</p>
                     <p class="card-text">{{applier.is_active}}</p>
-                    <a href="#" class="btn btn-outline-primary" @click="$router.push(`/vacancies/${vacanciesAppliers.id}`)">Go to</a>
+                    <a href="#" class="btn btn-outline-primary" @click="$router.push(`/users/profile/${applier.id}`)">Profile</a>
                 </div>
             </div>
         </div>
