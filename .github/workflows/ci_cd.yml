@@ -42,8 +42,8 @@ jobs:
             pipenv install --dev
         - name: Check migrations
           run: |
-            pipenv run init -t async migrations
-            pipenv run revision --autogenerate -m "init"
+            pipenv run alembic init -t async migrations
+            pipenv run alembic revision --autogenerate -m "init"
             pipenv run alembic upgrade head
         - name: Run tests
           run: |
