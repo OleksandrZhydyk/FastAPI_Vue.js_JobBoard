@@ -4,5 +4,4 @@ __pycache__
 .env
 .pytest_cache
 Pipfile.lock
-migrations
 .gitignore
