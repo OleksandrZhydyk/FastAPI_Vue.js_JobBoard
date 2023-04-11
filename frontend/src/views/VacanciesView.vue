@@ -119,7 +119,5 @@ export default {
             );
         }
     },
-
-
 }
 </script>

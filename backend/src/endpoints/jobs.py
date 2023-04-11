@@ -9,8 +9,7 @@ from db.repositories.jobs import JobsService, get_jobs_service
 from schemas.custom_page import Page
 from schemas.job import JobCreate, JobOut, JobApplied, JobUpdate, JobCategory, JobDetail
 from schemas.token import Status
-from schemas.user import UserOut
-
+from schemas.user import UserOut, UserInDB
 
 router_vacancies = APIRouter()
 
@@ -30,9 +29,17 @@ async def get_vacancies(
     job_service: JobsService = Depends(get_jobs_service),
     db: AsyncSession = Depends(get_session),
     job_categories: List[JobCategory] = Query(None)
-    # job_categories: JobCategory = None,
 ):
     return await job_service.get_all(db, job_categories)
+
+
+@router_vacancies.get("/me", response_model=List[JobOut])
+async def get_company_jobs(
+    job_service: JobsService = Depends(get_jobs_service),
+    current_user: UserInDB = Depends(check_company_credentials),
+    db: AsyncSession = Depends(get_session),
+):
+    return await job_service.get_company_vacancies(current_user, db)
 
 
 @router_vacancies.get("/{pk}", response_model=JobDetail)

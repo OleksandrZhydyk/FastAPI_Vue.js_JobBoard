@@ -11,16 +11,14 @@
             <a class="nav-link active" aria-current="page" href="#" @click="$router.push('/')">Vacancies</a>
             <a class="nav-link active" href="#" v-if="isCompany && isLoggedIn" @click="$router.push('/me/vacancies')">My vacancies</a>
             <a class="nav-link active" href="#" v-if="isCompany && isLoggedIn" @click="$router.push('/me/vacancies/archive')">Archived vacancies</a>
-            <a class="nav-link active" href="#" v-if="isLoggedIn && !isCompany" @click="$router.push()">Applied vacancies</a>
+            <a class="nav-link active" href="#" v-if="isLoggedIn && !isCompany" @click="$router.push('/me/applied_vacancies')">Applied vacancies</a>
+            <a class="nav-link active" href="#" v-if="isLoggedIn" @click="$router.push('/me')">Profile</a>
           </div>
         </div>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
 
         <router-link class="btn btn-outline-primary ms-2" v-if="isLoggedIn" @click="logOut" to="/login">Logout</router-link>
-        <router-link class="btn btn-outline-primary ms-2" to="/login" v-else >Login</router-link>
+        <router-link class="btn btn-outline-primary ms-2" to="/login" v-if="!isLoggedIn" >Login</router-link>
+        <router-link class="btn btn-outline-success ms-2" to="/register" v-if="!isLoggedIn" >SignIn</router-link>
       </div>
     </nav>
  </header>

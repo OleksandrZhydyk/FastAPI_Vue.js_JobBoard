@@ -35,7 +35,7 @@
                 </div>
             </div>
         </div>
-        <modal-error v-if="updated" :updated="updated" :error="error" :modal="modal"/>
+        <modal-error @modal="getModal" v-if="modal" :updated="updated" :error="error" :modal="modal"/>
     </form>
 </template>
 
@@ -59,6 +59,12 @@ export default {
         ...mapActions({
             updateVacancy: 'allVacancies/updateVacancy'
         }),
+        getModal(event){
+            this.modal = false,
+            this.error = false,
+            this.updated = false,
+            this.created = false
+        },
         async modifyVacancy(vacancy){
             try {
             let data = {

@@ -26,6 +26,8 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
     created_jobs = relationship("Job", backref="company_created")
+    avatar = Column(String)
+    resume = Column(String)
 
     vacancies = relationship(
         "Job", secondary=association_table, back_populates="appliers", order_by="Job.created_at"

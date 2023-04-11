@@ -48,7 +48,7 @@
                 </div>
             </div>
         </div>
-        <modal-error v-if="created" :created="created" :error="error" :modal="modal"/>
+        <modal-error @modal="getModal" v-if="modal" :created="created" :error="error" :modal="modal"/>
     </form>
 </template>
 
@@ -80,6 +80,12 @@ export default {
         ...mapActions({
             createVacancy: 'allVacancies/createVacancy',
         }),
+        getModal(event){
+            this.modal = false,
+            this.error = false,
+            this.updated = false,
+            this.created = false
+        },
         async publishVacancy(vacancy){
             try {
                 const res = await this.createVacancy(vacancy)

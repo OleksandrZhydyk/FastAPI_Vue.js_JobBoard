@@ -1,42 +1,44 @@
 <template>
     <div v-if="applicant">
-        <div class="row">
-            <div class="col-md">
-                <div class="p-3 py-5">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="text-right">Profile</h4>
+        <div class="container rounded mt-5 mb-5">
+            <div class="row">
+                <div class="col-md-4">
+                    <div v-if="applicant.avatar" class="d-flex flex-column align-items-center text-center p-3 py-5 mt-3"><img
+                            class="rounded-circle"
+                            :src="applicant.avatar"
+                            alt="avatar">
                     </div>
-                    <div class="row mt-2">
-                        <div class="col-md-6">
-                            <label class="labels" for="title">Title</label>
-                            <input type="text" id="title" name="title" class="form-control" :value="applicant.name" readonly/>
-                        </div>
-                        <div class="col-md-6">
-                            <span class="float-end">Published: {{}}</span>
-                        </div>
+                    <div v-else class="d-flex flex-column align-items-center text-center p-3 py-5 mt-3"><img
+                            class="rounded-circle"
+                            src="http://localhost:8000/static/default_imgs/empty_avatar.png"
+                            alt="avatar">
                     </div>
-                    <div class="row mt-2">
-                        <div class="col-md-3">
-                            <label class="labels" for="salary_from">Salary from</label>
-                            <input type="number" :value="applicant.email" min="0" id="salary_from" name="salary_from" class="form-control" readonly/>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 py-5">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="text-right">Profile</h4>
                         </div>
-                        <div class="col-md-3">
-                            <label class="labels" for="salary_up_to">Salary up to</label>
-                            <input type="number" min="0" id="salary_up_to" name="salary_to" class="form-control" readonly/>
+                        <div class="row mt-3">
+                            <div class="col-md-6"><label class="labels">First Name</label>
+                                <input type="text" :value="applicant.name" id="name" name="name" class="form-control" readonly/>
+
+                            </div>
+                            <div class="col-md-6"><label class="labels">Resume:</label>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="labels" for="category">Category</label>
-                            <input type="text"  min="0" id="category" name="category" class="form-control" readonly/>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="labels" for="email">Email</label>
-                            <input type="text"  min="0" id="email" name="email" class="form-control" readonly/>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-md-12">
-                            <label class="labels" for="description">Description</label>
-                            <textarea type="text" id="description" name="description" class="form-control" readonly rows="4"></textarea>
+                        <div class="row ">
+                            <div class="col-md-6 mt-3"><label class="labels">Email</label>
+                                <input type="text" :value="applicant.email" id="email" name="email" class="form-control" readonly/>
+                            </div>
+                            <div v-if="applicant.resume" class="col-md-6">
+                                <a :href="applicant.resume">
+                                    <img src="http://localhost:8000/static/default_imgs/pdf_download.png" style="width:75px;height:75px;">
+                                </a>
+                            </div>
+                            <div v-else class="col-md-6">
+                               <img src="http://localhost:8000/static/default_imgs/gray_pdf.png" style="width:75px;height:75px;">
+                            </div>
                         </div>
                     </div>
                 </div>

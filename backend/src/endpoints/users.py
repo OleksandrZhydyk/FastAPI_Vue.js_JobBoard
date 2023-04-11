@@ -1,7 +1,10 @@
+import json
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+import pydantic
+from fastapi import APIRouter, Depends, UploadFile, Form, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from db.base import get_session
 from core.security import (
@@ -10,7 +13,6 @@ from core.security import (
     check_company_credentials,
 )
 from db.repositories.users import UsersService, get_users_service
-from schemas.job import JobOut
 from schemas.token import Status
 from schemas.user import UserCreate, UserOut, UserInDB, UserUpdate, UserResponse
 
@@ -46,21 +48,25 @@ async def get_me(
 
 @router_users.put("/me", response_model=UserOut)
 async def update_me(
-    obj_in: UserUpdate,
+    email: str = Form(None),
+    name: str = Form(None),
+    clear_avatar: bool = Form(False),
+    clear_resume: bool = Form(False),
+    password: str = Form(None),
+    avatar: UploadFile | None = None,
+    resume: UploadFile | None = None,
     user_service: UsersService = Depends(get_users_service),
     db: AsyncSession = Depends(get_session),
     current_user: UserOut = Depends(get_current_active_user),
 ):
-    return await user_service.update(obj_in, current_user, db)
+    try:
+        user_update_data = UserUpdate(email=email, name=name, password=password)
+    except pydantic.ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=json.loads(e.json())
+        )
 
-
-@router_users.get("/me/vacancies", response_model=List[JobOut])
-async def get_company_jobs(
-    user_service: UsersService = Depends(get_users_service),
-    current_user: UserInDB = Depends(check_company_credentials),
-    db: AsyncSession = Depends(get_session),
-):
-    return await user_service.get_company_vacancies(current_user, db)
+    return await user_service.update(user_update_data, avatar, clear_avatar, resume, clear_resume, current_user, db)
 
 
 @router_users.get("/{pk}", response_model=UserOut)
@@ -73,14 +79,30 @@ async def get_one(
     return await user_service.get_one(pk, current_user, db)
 
 
-@router_users.put("/{pk}", response_model=UserUpdate)
+@router_users.put("/{pk}", response_model=UserOut)
 async def update_user(
-    obj_in: UserUpdate,
+    email: str = Form(None),
+    name: str = Form(None),
+    is_company: bool = Form(None),
+    is_active: bool = Form(None),
+    password: str = Form(None),
+    clear_avatar: bool = Form(False),
+    clear_resume: bool = Form(False),
+    avatar: UploadFile | None = None,
+    resume: UploadFile | None = None,
     user_service: UsersService = Depends(get_users_service),
     current_user: UserInDB = Depends(check_superuser_credentials),
     db: AsyncSession = Depends(get_session),
 ) -> UserOut:
-    return await user_service.update(obj_in, current_user, db)
+    try:
+        user_update_data = UserUpdate(
+            email=email, name=name, password=password,
+            is_company=is_company, is_active=is_active)
+    except pydantic.ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=json.loads(e.json())
+        )
+    return await user_service.update(user_update_data, avatar, clear_avatar, resume, clear_resume, current_user, db)
 
 
 @router_users.delete("/{pk}", response_model=Status)

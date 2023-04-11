@@ -66,14 +66,14 @@ export const vacanciesModule = {
         let {data} = await axios.get(`vacancies/${id}/apply`);
         commit('setVacancyAppliers', data);
       },
-      async createVacancy(vuexContext, payload) {
+      async createVacancy({}, payload) {
         let res = await axios.post('vacancies/', payload);
         if (res.status !== 200) {
             return false
         }
         return true
       },
-      async updateVacancy(vuexContext, data) {
+      async updateVacancy({}, data) {
         const {id, ...params} = data
         let res = await axios.put(`vacancies/${id}`, params);
         if (res.status !== 200) {

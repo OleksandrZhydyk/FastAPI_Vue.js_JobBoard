@@ -3,17 +3,13 @@
 <div v-if="modal" class="modal" tabindex="-1" style="display:block; background-color: rgba(0, 0, 0, 0.77);"  aria-hidden="true" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <!-- <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div> -->
       <div class="modal-body">
         <p v-if="updated" class="text-center fs-3">Vacancy updated successfully</p>
         <p v-if="created" class="text-center fs-3">Vacancy created successfully</p>
         <p v-if="error" class="text-center fs-3">Error occurred</p>
       </div>
       <div class="modal-footer">
-        <button type="button" @click="modal=false" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" @click='$emit("modal")' class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -23,7 +19,6 @@
 
 <script>
 export default{
-
     props: {
         created: {
             type: Boolean,
@@ -41,7 +36,7 @@ export default{
             type: Boolean,
             value: false,
         }
-    }
+    },
 }
 
 </script>

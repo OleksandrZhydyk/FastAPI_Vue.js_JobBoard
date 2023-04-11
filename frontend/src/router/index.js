@@ -8,6 +8,9 @@ import VacancyUpdate from '@/views/VacancyUpdate.vue'
 import CreateVacancy from '@/views/CreateVacancy.vue'
 import ArchivedVacancies from '@/views/ArchivedVacancies.vue'
 import ApplicantProfile from '@/views/ApplicantProfile.vue'
+import UserProfile from '@/views/UserProfile.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import AppliedVacancies from '@/views/AppliedVacancies.vue'
 import store from '@/store'
 
 const routes = [
@@ -15,6 +18,11 @@ const routes = [
     path: '/',
     name: 'main',
     component: VacanciesView
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterView
   },
   {
     path: '/login',
@@ -31,6 +39,18 @@ const routes = [
     path: '/me/vacancies',
     name: 'companyVacancies',
     component: CompanyVacancies,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/me',
+    name: 'userProfile',
+    component: UserProfile,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/me/applied_vacancies',
+    name: 'appliedVacancies',
+    component: AppliedVacancies,
     meta: { requiresAuth: true },
   },
   {
@@ -61,11 +81,6 @@ const routes = [
     name: 'appliers',
     component: VacancyAppliers,
     meta: { requiresAuth: true },
-  },
-  {
-    path: '/about',
-    name: 'about',
-    component: () => import(/* webpackChunkName: "about" */ '@/views/AboutView.vue')
   },
 ]
 

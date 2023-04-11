@@ -49,9 +49,26 @@ export const usersModule = {
         let {data} = await axios.get('/users/me');
         await commit('setUser', data);
       },
+      async updateProfile({}, form_data) {
+          try {
+            const res = await axios.put('/users/me', form_data,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                }
+            );
+            if (res.status !== 200) {
+                return false
+            }
+            return true
+          } catch(e) {
+            console.log(e)
+          }
+      },
       async getMyCompanyVacancies({commit}) {
           try {
-            let res = await axios.get('/users/me/vacancies');
+            let res = await axios.get('/vacancies/me');
             await commit('setCompanyVacancies', res.data);
           } catch(e) {
             console.log(e)
@@ -62,6 +79,9 @@ export const usersModule = {
       async getUser({commit}, id) {
         let {data} = await axios.get(`/users/${id}`);
         await commit('setApplicant', data);
+      },
+      async createUser({}, payload) {
+        let {data} = await axios.post("/users", payload);
       },
 
       async logOut({commit}){

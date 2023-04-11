@@ -33,6 +33,9 @@ class Config:
     ACCESS_TOKEN_EXPIRE_SECONDS = os.getenv("ACCESS_TOKEN_EXPIRE_SECONDS", 60)
     REFRESH_TOKEN_EXPIRE_SECONDS = os.getenv("REFRESH_TOKEN_EXPIRE_SECONDS", 3600)
     ALGORITHM = os.getenv("ALGORITHM", "HS256")
+    MEDIA_ROOT = "media/"
+    STATIC_ROOT = os.getenv("STATIC_ROOT", "static")
+    HOSTED_DOMAIN = os.getenv("HOSTED_DOMAIN", "http://localhost:8000")
 
 
 class AuthJWTSettings(BaseModel):

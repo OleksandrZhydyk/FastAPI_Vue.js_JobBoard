@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 
+from core.iofiles import upload_file
 from core.security import hash_password
 from db.models.jobs import Job
 from schemas.token import Status
@@ -49,21 +50,31 @@ class UsersService:
         return db_obj
 
     async def update(
-        self, obj_in: UserUpdate, user_db: UserOut, db: AsyncSession
+        self, user_update_data, avatar, clear_avatar, resume, clear_resume, user_db: UserOut, db: AsyncSession
     ) -> UserOut:
-        obj_dict = obj_in.dict(exclude_none=True)
-        obj_dict["updated_at"] = datetime.utcnow()
+        obj_dict = user_update_data.dict(exclude_none=True)
+        if avatar and not clear_avatar:
+            path_avatar = await upload_file('avatars', avatar)
+            obj_dict["avatar"] = path_avatar
+        if clear_avatar:
+            obj_dict["avatar"] = None
+        if resume and not clear_resume:
+            path_resume = await upload_file('resumes', resume)
+            obj_dict["resume"] = path_resume
+        if clear_resume:
+            obj_dict["resume"] = None
         if obj_dict.get("password"):
             hashed_password = hash_password(obj_dict["password"])
             del obj_dict["password"]
             obj_dict["hashed_password"] = hashed_password
+        obj_dict["updated_at"] = datetime.utcnow()
         query = (
             update(self.model)
             .where(self.model.id == user_db.id)
             .values(**obj_dict)
             .returning(self.model)
         )
-        instance = await db.execute(query)
+        db_obj = await db.execute(query)
         try:
             await db.commit()
         except IntegrityError:
@@ -78,7 +89,7 @@ class UsersService:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail=f"Database error: {err}",
             )
-        return instance.scalar_one()
+        return db_obj.scalar_one()
 
     async def get_all(self, db: AsyncSession) -> List[UserOut]:
         query = select(self.model)
@@ -89,15 +100,6 @@ class UsersService:
             )
         return db_obj
 
-    async def get_company_vacancies(self, user_db: UserOut, db: AsyncSession):
-        query = select(Job).filter(user_db.id == Job.user_id).order_by(Job.updated_at.desc())
-        db_obj = await db.execute(query)
-        instance = db_obj.scalars().all()
-        if not instance:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects"
-            )
-        return instance
 
     async def get_one(self, pk: int, user_db: UserOut, db: AsyncSession) -> UserOut:
         if user_db.is_company or user_db.is_superuser or user_db.id == pk:

@@ -7,7 +7,7 @@ from pydantic import BaseModel, EmailStr, validator, constr
 
 class UserBase(BaseModel):
     email: EmailStr
-    name: constr(min_length=1)
+    name: Optional[constr(min_length=2)]
 
 
 class UserOut(UserBase):
@@ -17,6 +17,8 @@ class UserOut(UserBase):
     is_superuser: bool
     created_at: datetime
     updated_at: datetime
+    avatar: Optional[str] = None
+    resume: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -25,8 +27,7 @@ class UserOut(UserBase):
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr]
-    is_company: Optional[bool]
-    name: Optional[constr(min_length=1)]
+    name: Optional[constr(min_length=2)]
     password: Optional[constr(min_length=8)]
 
     class Config:
@@ -35,9 +36,11 @@ class UserUpdate(BaseModel):
 
     @validator("name")
     def validate_name(cls, name):
-        if name.isalpha():
-            return name
-        raise HTTPException(status_code=422, detail="Name should contains only letters")
+        if name:
+            if name.isalpha():
+                return name
+            raise HTTPException(status_code=422, detail="Name should contains only letters")
+        return name
 
 
 class UserResponse(UserOut):

@@ -28,6 +28,7 @@ fastapi-pagination = "*"
 flake8 = "*"
 black = "*"
 fastapi-jwt-auth = "*"
+aiofiles = "*"
 
 [dev-packages]
 

@@ -145,6 +145,16 @@ class JobsService:
         instance = db_obj.scalar()
         return instance
 
+    async def get_company_vacancies(self, user_db: UserOut, db: AsyncSession):
+        query = select(Job).filter(user_db.id == Job.user_id).order_by(Job.updated_at.desc())
+        db_obj = await db.execute(query)
+        instance = db_obj.scalars().all()
+        if not instance:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="There are no objects"
+            )
+        return instance
+
 
 def get_jobs_service() -> JobsService:
     return JobsService()

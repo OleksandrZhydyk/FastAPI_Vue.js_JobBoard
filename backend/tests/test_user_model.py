@@ -1,3 +1,4 @@
+import httpx
 import pytest
 from starlette import status
 
@@ -78,7 +79,6 @@ async def test_create_user_duplicate(client, create_user):
         (
             {
                 "email": "test_user@test.com",
-                "is_company": "false",
                 "password": "password",
                 "confirmed_password": "password",
             },
@@ -86,7 +86,7 @@ async def test_create_user_duplicate(client, create_user):
             {
                 "detail": [
                     {
-                        "loc": ["body", "name"],
+                        "loc": ["body", "is_company"],
                         "msg": "field required",
                         "type": "value_error.missing",
                     }
@@ -125,9 +125,9 @@ async def test_create_user_duplicate(client, create_user):
                 "detail": [
                     {
                         "loc": ["body", "name"],
-                        "msg": "ensure this value has at least 1 characters",
+                        "msg": "ensure this value has at least 2 characters",
                         "type": "value_error.any_str.min_length",
-                        "ctx": {"limit_value": 1},
+                        "ctx": {"limit_value": 2},
                     }
                 ]
             },
@@ -155,7 +155,6 @@ async def test_get_me(authorized_client):
 
 async def test_get_user(create_user, superuser_client):
     resp = await superuser_client.get("/users/1")
-    print(resp.json())
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["email"] == "test@test.com"
     assert resp.json()["name"] == "Test"
@@ -181,7 +180,7 @@ async def test_user_update_of_another_user(authorized_client, create_superuser):
     ),
 )
 async def test_update_me(authorized_client, update_field, update_value):
-    resp = await authorized_client.put("/users/me", json={update_field: update_value})
+    resp = await authorized_client.put("/users/me", data={update_field: update_value})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()[update_field] == update_value
     assert resp.json()["is_company"] is False
@@ -196,15 +195,15 @@ async def test_update_me(authorized_client, update_field, update_value):
             {"detail": "Name should contains only letters"},
         ),
         (
-            {"name": ""},
+            {"name": "a"},
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             {
                 "detail": [
                     {
-                        "loc": ["body", "name"],
-                        "msg": "ensure this value has at least 1 characters",
+                        "ctx": {"limit_value": 2},
+                        "loc": ["name"],
+                        "msg": "ensure this value has at least 2 characters",
                         "type": "value_error.any_str.min_length",
-                        "ctx": {"limit_value": 1},
                     }
                 ]
             },
@@ -215,7 +214,7 @@ async def test_update_me(authorized_client, update_field, update_value):
             {
                 "detail": [
                     {
-                        "loc": ["body", "email"],
+                        "loc": ["email"],
                         "msg": "value is not a valid email address",
                         "type": "value_error.email",
                     }
@@ -223,12 +222,12 @@ async def test_update_me(authorized_client, update_field, update_value):
             },
         ),
         (
-            {"email": ""},
+            {"email": "not_email"},
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             {
                 "detail": [
                     {
-                        "loc": ["body", "email"],
+                        "loc": ["email"],
                         "msg": "value is not a valid email address",
                         "type": "value_error.email",
                     }
@@ -240,10 +239,9 @@ async def test_update_me(authorized_client, update_field, update_value):
 async def test_update_me_fail(
     authorized_client, updated_user_data, expected_status_code, expected_detail
 ):
-    resp = await authorized_client.put("/users/me", json=updated_user_data)
+    resp = await authorized_client.put("/users/me", data=updated_user_data)
     assert resp.status_code == expected_status_code
     assert resp.json() == expected_detail
-
 
 @pytest.mark.parametrize(
     "update_field, update_value",
@@ -253,7 +251,7 @@ async def test_update_me_fail(
     ),
 )
 async def test_update_user(create_user, superuser_client, update_field, update_value):
-    resp = await superuser_client.put("/users/1", json={update_field: update_value})
+    resp = await superuser_client.put("/users/1", data={update_field: update_value})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()[update_field] == update_value
     assert resp.json()["is_company"] is False

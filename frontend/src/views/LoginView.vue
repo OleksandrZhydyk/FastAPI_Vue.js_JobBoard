@@ -1,7 +1,8 @@
 <template>
 <div class="container d-flex align-items-center justify-content-center p-5">
-  <div class="card p-5 bg-white col-md-6 mt-4">
-     <form @submit.prevent="submit" style="margin: auto;" class="text-center mt-5 mb-5">
+  <div class="card p-5 bg-white col-md-6 ">
+     <form @submit.prevent="submit" style="margin: auto;" class="text-center mt-2 mb-5">
+     <h2 class="mb-5">Login</h2>
       <div class="mb-3">
         <label for="username" class="form-label">Username</label>
         <input type="text" name="username" v-model="form.username" class="form-control" required="true"/>
