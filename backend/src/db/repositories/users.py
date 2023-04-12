@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+from asyncpg import UniqueViolationError
 from fastapi import status
 from fastapi import HTTPException
 from fastapi_pagination.ext.async_sqlalchemy import paginate
@@ -27,7 +28,6 @@ class UsersService:
         hashed_password = hash_password(obj_dict.get("password"))
         db_obj = self.model(
             email=obj_dict.get("email"),
-            name=obj_dict.get("name"),
             is_company=obj_dict.get("is_company"),
             is_active=True,
             hashed_password=hashed_password,
@@ -74,8 +74,8 @@ class UsersService:
             .values(**obj_dict)
             .returning(self.model)
         )
-        db_obj = await db.execute(query)
         try:
+            db_obj = await db.execute(query)
             await db.commit()
         except IntegrityError:
             await db.rollback()

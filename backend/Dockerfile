@@ -2,19 +2,20 @@ FROM python:3.10
 
 RUN apt update
 
-RUN mkdir "fastApiProject"
+RUN mkdir "backend"
 
-WORKDIR /fastApiProject
+WORKDIR /backend
 
-COPY ./src ./src
-COPY src/main.py ./main.py
 COPY ./Pipfile ./Pipfile
 COPY ./Pipfile.lock ./Pipfile.lock
-COPY ./commands ./commands
 
 RUN python -m pip install --upgrade pip
 #RUN pip install -r ./requirements.txt
 RUN pip install pipenv
 RUN pipenv install --system --deploy
+
+COPY ./src ./src
+COPY ./commands ./commands
+RUN chmod a+x ./commands/start_server.sh
 
 CMD ["bash"]

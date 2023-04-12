@@ -15,7 +15,7 @@
                     <div class="card-body">
                         <p class="card-text">{{vacancy.category}}</p>
                         <h5 class="card-title">{{vacancy.description}}</h5>
-                        <a href="#" class="btn btn-primary" @click="$router.push(`/vacancies/${vacancy.id}/appliers`)">Get Appliers</a>
+                        <router-link href="#" class="btn btn-primary" :to="{name: 'appliers', params: { id: vacancy.id }}">Get Appliers</router-link>
                     </div>
                 </div>
             </div>

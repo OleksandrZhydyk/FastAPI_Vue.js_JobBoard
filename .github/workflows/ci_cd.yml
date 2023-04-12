@@ -45,6 +45,8 @@ jobs:
             pipenv run alembic upgrade head
         - name: Run tests
           run: |
+            cd src && mkdir static
+            cd ..
             pipenv run python -m pytest
         - name: Run flake8
           run: |

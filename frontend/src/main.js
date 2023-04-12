@@ -12,7 +12,8 @@ const app = createApp(App).use(router)
 import "bootstrap/dist/js/bootstrap.js"
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:8000/';
+
+axios.defaults.baseURL = process.env.VUE_APP_BACKEND;
 axios.interceptors.response.use( resp => resp, async error => {
     console.log(error.config)
     if (error.response.status === 422 && error.response.data.detail === "Signature has expired"){

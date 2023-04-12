@@ -14,7 +14,7 @@ from core.security import (
 )
 from db.repositories.users import UsersService, get_users_service
 from schemas.token import Status
-from schemas.user import UserCreate, UserOut, UserInDB, UserUpdate, UserResponse
+from schemas.user import UserCreate, UserOut, UserInDB, UserUpdate, UserResponse, UserUpdateSuperuser
 
 router_users = APIRouter()
 
@@ -83,8 +83,8 @@ async def get_one(
 async def update_user(
     email: str = Form(None),
     name: str = Form(None),
-    is_company: bool = Form(None),
-    is_active: bool = Form(None),
+    is_company: bool = Form(False),
+    is_active: bool = Form(False),
     password: str = Form(None),
     clear_avatar: bool = Form(False),
     clear_resume: bool = Form(False),
@@ -95,7 +95,7 @@ async def update_user(
     db: AsyncSession = Depends(get_session),
 ) -> UserOut:
     try:
-        user_update_data = UserUpdate(
+        user_update_data = UserUpdateSuperuser(
             email=email, name=name, password=password,
             is_company=is_company, is_active=is_active)
     except pydantic.ValidationError as e:

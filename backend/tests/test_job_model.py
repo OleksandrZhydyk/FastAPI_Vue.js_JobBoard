@@ -44,6 +44,23 @@ async def test_update_job(company_client, create_job, update_field, update_value
     assert resp.json()[update_field] == update_value
 
 
+@pytest.mark.parametrize(
+    "update_field, update_value",
+    (
+        ("email", "updated_test_user@test.com"),
+        ("title", "updated title"),
+    ),
+)
+async def test_update_job_superuser(superuser_client, create_job, update_field, update_value):
+    print(superuser_client)
+    resp = await superuser_client.put(
+        f"vacancies/{create_job.id}", json={update_field: update_value}
+    )
+    print(resp.json())
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()[update_field] == update_value
+
+
 async def test_delete_job(company_client, create_job):
     resp = await company_client.delete(f"vacancies/{create_job.id}")
     assert resp.status_code == status.HTTP_200_OK

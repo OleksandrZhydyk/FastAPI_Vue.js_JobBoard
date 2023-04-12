@@ -9,7 +9,7 @@
           <div class="card-body">
             <h5 class="card-title">{{vacancy.title}}</h5>
             <p class="card-text">{{vacancy.description}}</p>
-            <a href="#" class="btn btn-primary" @click="$router.push(`/vacancies/${vacancy.id}`)">Go to</a>
+            <router-link class="btn btn-primary" :to="{name: 'vacancies', params: { id: vacancy.id }}">Go to</router-link>
           </div>
         </div>
     </div>

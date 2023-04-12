@@ -57,7 +57,6 @@ async def session():
 async def create_user(session):
     db_obj = User(
         email="test@test.com",
-        name="Test",
         is_active=True,
         hashed_password=hash_password("testpass"),
     )
@@ -70,7 +69,6 @@ async def create_user(session):
 async def create_company(session):
     db_obj = User(
         email="company@test.com",
-        name="Test",
         is_company=True,
         is_active=True,
         hashed_password=hash_password("testpass"),
@@ -113,6 +111,7 @@ async def create_superuser(session):
         email="superuser@test.com",
         name="Test",
         is_active=True,
+        is_company=True,
         is_superuser=True,
         hashed_password=hash_password("superuserpass"),
     )

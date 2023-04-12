@@ -54,7 +54,10 @@
                     <h5 class="card-title">{{applier.name}}</h5>
                     <p class="card-text">{{applier.created_at}}</p>
                     <p class="card-text">{{applier.is_active}}</p>
-                    <a href="#" class="btn btn-outline-primary" @click="$router.push(`/users/profile/${applier.id}`)">Profile</a>
+                    <router-link
+                        class="btn btn-outline-primary"
+                        :to="{name:'applicantProfile', params: { id: applier.id }}">Profile
+                    </router-link>
                 </div>
             </div>
         </div>

@@ -19,10 +19,9 @@
                 <div class="card-body">
                     <p class="card-text">{{vacancy.category}}</p>
                     <h5 class="card-title">{{vacancy.description}}</h5>
-                    <a href="#" class="btn btn-primary" @click="$router.push(`/vacancies/${vacancy.id}/appliers`)">Get Appliers</a>
+                    <router-link class="btn btn-primary" :to="{name: 'appliers', params: { id: vacancy.id }}">Get Appliers</router-link>
                     <a href="#" class="btn btn-danger float-end" @click="removeJob(vacancy.id)">Deactivate</a>
                     <router-link class="btn btn-warning float-end me-2" :to="{name: 'vacanciesUpdate', params: { id: vacancy.id }, query: { ...vacancy }}">Edit</router-link>
-                    <!-- <a href="#" class="btn btn-warning float-end me-2" @click="$router.push(`/vacancies/${vacancy.id}/update`, params: { vacancy })">Edit</a> -->
                 </div>
             </div>
         </div>

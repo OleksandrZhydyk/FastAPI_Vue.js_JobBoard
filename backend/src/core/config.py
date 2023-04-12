@@ -44,10 +44,10 @@ class AuthJWTSettings(BaseModel):
     authjwt_cookie_samesite: str = 'lax'
     authjwt_cookie_secure: bool = False
     authjwt_secret_key: str = Config.SECRET_KEY
-    authjwt_algorithm = Config.ALGORITHM
-    authjwt_access_token_expires = Config.ACCESS_TOKEN_EXPIRE_SECONDS
-    authjwt_refresh_token_expires = Config.REFRESH_TOKEN_EXPIRE_SECONDS
-    authjwt_cookie_max_age = Config.REFRESH_TOKEN_EXPIRE_SECONDS
+    authjwt_algorithm: str = Config.ALGORITHM
+    authjwt_access_token_expires: int = Config.ACCESS_TOKEN_EXPIRE_SECONDS
+    authjwt_refresh_token_expires: int = Config.REFRESH_TOKEN_EXPIRE_SECONDS
+    authjwt_cookie_max_age: int = 3600
 
 
 @AuthJWT.load_config

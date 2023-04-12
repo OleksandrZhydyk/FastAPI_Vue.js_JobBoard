@@ -7,7 +7,6 @@ from pydantic import BaseModel, EmailStr, validator, constr
 
 class UserBase(BaseModel):
     email: EmailStr
-    name: Optional[constr(min_length=2)]
 
 
 class UserOut(UserBase):
@@ -19,6 +18,7 @@ class UserOut(UserBase):
     updated_at: datetime
     avatar: Optional[str] = None
     resume: Optional[str] = None
+    name: Optional[constr(min_length=1)] = None
 
     class Config:
         orm_mode = True
@@ -43,12 +43,16 @@ class UserUpdate(BaseModel):
         return name
 
 
+class UserUpdateSuperuser(UserUpdate):
+    is_company: bool
+    is_active: bool
+
 class UserResponse(UserOut):
     vacancies: Optional[List]
 
 
 class UserCreate(UserBase):
-    is_company: bool
+    is_company: bool = False
     password: constr(min_length=8)
     confirmed_password: str
 

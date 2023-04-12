@@ -1,16 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/views/LoginView.vue'
 import VacanciesView from '@/views/VacanciesView.vue'
-import VacancyDetailView from '@/views/VacancyDetailView.vue'
-import CompanyVacancies from '@/views/CompanyVacancies.vue'
-import VacancyAppliers from '@/views/VacancyAppliers.vue'
-import VacancyUpdate from '@/views/VacancyUpdate.vue'
-import CreateVacancy from '@/views/CreateVacancy.vue'
-import ArchivedVacancies from '@/views/ArchivedVacancies.vue'
-import ApplicantProfile from '@/views/ApplicantProfile.vue'
-import UserProfile from '@/views/UserProfile.vue'
-import RegisterView from '@/views/RegisterView.vue'
-import AppliedVacancies from '@/views/AppliedVacancies.vue'
 import store from '@/store'
 
 const routes = [
@@ -22,65 +11,70 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: RegisterView
+    component: () => import('@/views/RegisterView.vue')
   },
   {
     path: '/login',
     name: 'login',
-    component: LoginView
+    component: () => import('@/views/LoginView.vue')
   },
   {
     path: '/users/profile/:id',
     name: 'applicantProfile',
-    component: ApplicantProfile,
+    component: () => import('@/views/ApplicantProfile.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/me/vacancies',
     name: 'companyVacancies',
-    component: CompanyVacancies,
+    component: () => import('@/views/CompanyVacancies.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/me',
     name: 'userProfile',
-    component: UserProfile,
+    component: () => import('@/views/UserProfile.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/me/applied_vacancies',
     name: 'appliedVacancies',
-    component: AppliedVacancies,
+    component: () => import('@/views/AppliedVacancies.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/me/vacancies/archive',
     name: 'archivedVacancies',
-    component: ArchivedVacancies,
+    component: () => import('@/views/ArchivedVacancies.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/vacancies/create',
     name: 'createVacancy',
-    component: CreateVacancy,
+    component: () => import('@/views/CreateVacancy.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/vacancies/:id',
     name: 'vacancies',
-    component: VacancyDetailView
+    component: () => import('@/views/VacancyDetailView.vue')
   },
   {
     path: '/vacancies/:id/update',
     name: 'vacanciesUpdate',
-    component: VacancyUpdate,
+    component: () => import('@/views/VacancyUpdate.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/vacancies/:id/appliers',
     name: 'appliers',
-    component: VacancyAppliers,
+    component: () => import('@/views/VacancyAppliers.vue'),
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not_found',
+    component: () => import('@/views/PageNotFound.vue'),
   },
 ]
 
