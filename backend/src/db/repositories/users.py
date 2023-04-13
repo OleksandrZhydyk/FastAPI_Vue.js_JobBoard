@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 
-from asyncpg import UniqueViolationError
 from fastapi import status
 from fastapi import HTTPException
 from fastapi_pagination.ext.async_sqlalchemy import paginate
@@ -13,9 +12,8 @@ from sqlalchemy.orm import joinedload
 
 from core.iofiles import upload_file
 from core.security import hash_password
-from db.models.jobs import Job
 from schemas.token import Status
-from schemas.user import UserCreate, UserOut, UserUpdate
+from schemas.user import UserCreate, UserOut
 from db.models.users import User
 
 

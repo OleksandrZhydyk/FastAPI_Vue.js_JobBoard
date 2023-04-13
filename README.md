@@ -11,14 +11,15 @@ frameworks and correspond tech stack for building the complete app.
 * Alembic;
 * Pytest;
 * Docker, Docker Compose;
-* Vue;
+* Vue.js;
 
 
 ## TODO
 - [x] Integrate Alembic migrations
 - [x] Async CRUD and main business logic
 - [x] Login and permissions 
-- [x] Functional tests (Pytest)
+- [x] Integration async tests (Pytest)
 - [x] Add CI (GitHub Actions)
-- [ ] +/- Add docker compose support
-- [ ] Make Vue frontend
+- [x] Add docker compose support
+- [x] Make Vue.js frontend
+- [x] S3 bucket for media files

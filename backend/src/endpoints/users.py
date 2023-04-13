@@ -9,8 +9,7 @@ from starlette import status
 from db.base import get_session
 from core.security import (
     get_current_active_user,
-    check_superuser_credentials,
-    check_company_credentials,
+    check_superuser_credentials
 )
 from db.repositories.users import UsersService, get_users_service
 from schemas.token import Status

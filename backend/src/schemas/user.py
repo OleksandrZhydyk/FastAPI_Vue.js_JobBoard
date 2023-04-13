@@ -47,6 +47,7 @@ class UserUpdateSuperuser(UserUpdate):
     is_company: bool
     is_active: bool
 
+
 class UserResponse(UserOut):
     vacancies: Optional[List]
 
