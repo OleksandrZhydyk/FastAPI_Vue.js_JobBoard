@@ -23,3 +23,4 @@ frameworks and correspond tech stack for building the complete app.
 - [x] Add docker compose support
 - [x] Make Vue.js frontend
 - [x] S3 bucket for media files
+- [x] Nginx support

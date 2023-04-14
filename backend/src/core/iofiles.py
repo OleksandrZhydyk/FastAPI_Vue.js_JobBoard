@@ -1,7 +1,6 @@
-import logging
-
 import aioboto3
 import aiofiles
+import logging
 import time
 
 from botocore.exceptions import ClientError
@@ -24,8 +23,7 @@ async def upload_file(sub_path: str, file: UploadFile):
                     Config.AWS_STORAGE_BUCKET_NAME,
                     aws_s3_file_path
                 )
-                aws_s3_custom_domain = f'{Config.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-                return f'https://{aws_s3_custom_domain}/{aws_s3_file_path}'
+                return f'/{aws_s3_file_path}'
             except ClientError as e:
                 logging.error(e)
                 return None

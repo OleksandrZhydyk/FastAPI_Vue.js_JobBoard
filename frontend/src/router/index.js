@@ -28,7 +28,7 @@ const routes = [
     path: '/me/vacancies',
     name: 'companyVacancies',
     component: () => import('@/views/CompanyVacancies.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, isCompany: true },
   },
   {
     path: '/me',
@@ -46,13 +46,13 @@ const routes = [
     path: '/me/vacancies/archive',
     name: 'archivedVacancies',
     component: () => import('@/views/ArchivedVacancies.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, isCompany: true },
   },
   {
     path: '/vacancies/create',
     name: 'createVacancy',
     component: () => import('@/views/CreateVacancy.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, isCompany: true },
   },
   {
     path: '/vacancies/:id',
@@ -63,13 +63,18 @@ const routes = [
     path: '/vacancies/:id/update',
     name: 'vacanciesUpdate',
     component: () => import('@/views/VacancyUpdate.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, isCompany: true },
   },
   {
     path: '/vacancies/:id/appliers',
     name: 'appliers',
     component: () => import('@/views/VacancyAppliers.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, isCompany: true },
+  },
+  {
+    path: '/forbidden',
+    name: 'forbidden',
+    component: () => import('@/views/Forbidden.vue'),
   },
   {
     path: '/:pathMatch(.*)*',
@@ -84,6 +89,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth && record.meta.isCompany)) {
+    if (store.getters['allUsers/isCompany']) {
+      next();
+      return;
+    }
+    next('/forbidden');
+  }
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (store.getters['allUsers/isAuthenticated']) {
       next();

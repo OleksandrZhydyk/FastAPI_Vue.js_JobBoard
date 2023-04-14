@@ -16,7 +16,7 @@
                         </div>
                         <div v-else class="d-flex flex-column align-items-center text-center p-3 py-5 mt-4"><img
                                 class="rounded-circle"
-                                src="https://fastapimedia.s3.amazonaws.com/media/default_imgs/empty_avatar.png"
+                                src="media/default_imgs/empty_avatar.png"
                                 alt="avatar">
                                 <input @change="handleAvatarUpload($event)" type="file" name="avatar" class="form-control mt-2" accept="image/*" id="id_avatar">
                         </div>
@@ -42,7 +42,7 @@
                             <div v-if="user.resume" class="row mt-3">
                                 <div class="col-md-6">
                                     <a :href="user.resume">
-                                        <img class="d-block float-end" src="https://fastapimedia.s3.amazonaws.com/media/default_imgs/pdf_download.png" style="width:75px;height:75px;">
+                                        <img class="d-block float-end" src="media/default_imgs/pdf_download.png" style="width:75px;height:75px;">
                                     </a>
                                 </div>
                                 <div v-if="user.resume" class="col-md-6">
@@ -53,7 +53,7 @@
                             </div>
                             <div v-else class="row mt-3">
                                 <div class="col-md-6">
-                                   <img class="d-block float-end" src="https://fastapimedia.s3.amazonaws.com/media/default_imgs/gray_pdf.png" style="width:75px;height:75px;">
+                                   <img class="d-block float-end" src="media/default_imgs/gray_pdf.png" style="width:75px;height:75px;">
                                 </div>
                                 <div class="col-md-6">
                                     <input @change="handleResumeUpload($event)" type="file" name="resume" class="form-control mt-3" accept="image/*" id="id_file">
