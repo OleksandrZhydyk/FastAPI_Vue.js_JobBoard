@@ -98,7 +98,6 @@ class UsersService:
             )
         return db_obj
 
-
     async def get_one(self, pk: int, user_db: UserOut, db: AsyncSession) -> UserOut:
         if user_db.is_company or user_db.is_superuser or user_db.id == pk:
             query = select(self.model).where(self.model.id == pk).options(joinedload(User.vacancies))

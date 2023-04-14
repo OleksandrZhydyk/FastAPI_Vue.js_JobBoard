@@ -47,7 +47,7 @@ jobs:
           run: |
             cd src && mkdir static
             cd ..
-            pipenv run python pytest
+            pipenv run pytest
         - name: Run flake8
           run: |
             pipenv run flake8 --max-line-length=120 --exclude=*migrations* --ignore=F405,E402
