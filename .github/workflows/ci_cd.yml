@@ -19,7 +19,7 @@ jobs:
 
       services:
         postgres:
-          image: postgres:12
+          image: postgres:14
           ports:
             - 5432:5432
           env:
@@ -47,7 +47,7 @@ jobs:
           run: |
             cd src && mkdir static
             cd ..
-            pipenv run python -m pytest -s
+            pipenv run python pytest
         - name: Run flake8
           run: |
             pipenv run flake8 --max-line-length=120 --exclude=*migrations* --ignore=F405,E402
