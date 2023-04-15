@@ -1,7 +1,7 @@
 # FastAPI Job Board
 
 Job board application powered by FastAPI. 
-The main goal of this is too learning FastAPI, Vue 
+The main goal of this is to learn FastAPI, Vue 
 frameworks and correspond tech stack for building the complete app.
 
 
