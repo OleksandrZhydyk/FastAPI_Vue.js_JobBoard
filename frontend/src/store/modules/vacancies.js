@@ -60,12 +60,12 @@ export const vacanciesModule = {
         }
       },
       async getVacancy({commit}, id) {
-        const {data} = await axios.get(`vacancies/${id}/`);
+        const {data} = await axios.get(`vacancies/${id}`);
         commit('setVacancy', data);
       },
 
       async getVacancyAppliers({commit}, id) {
-        const {data} = await axios.get(`vacancies/${id}/apply/`);
+        const {data} = await axios.get(`vacancies/${id}/apply`);
         commit('setVacancyAppliers', data);
       },
       async createVacancy({}, payload) {
@@ -81,7 +81,7 @@ export const vacanciesModule = {
       async updateVacancy({}, data) {
         try{
           const {id, ...params} = data
-          const res = await axios.put(`vacancies/${id}/`, params);
+          const res = await axios.put(`vacancies/${id}`, params);
           if (res && res.status === 200) {
             return true
           }
@@ -91,7 +91,7 @@ export const vacanciesModule = {
       },
       async deleteVacancy({}, id) {
         try {
-          const res = await axios.delete(`vacancies/${id}/`);
+          const res = await axios.delete(`vacancies/${id}`);
           if (res && res.status === 200) {
             return true
           }
@@ -101,7 +101,7 @@ export const vacanciesModule = {
       },
       async applyToVacancy({}, vacancyId, userId) {
         try {
-          const res = await axios.post(`vacancies/${vacancyId}/apply/`, userId);
+          const res = await axios.post(`vacancies/${vacancyId}/apply`, userId);
           if (res && res.status === 200) {
               return true
           }

@@ -57,7 +57,7 @@ export const usersModule = {
     actions: {
       async logIn({dispatch}, form_data) {
           try {
-            const res = await axios.post('/auth/login/', form_data);
+            const res = await axios.post('/auth/login', form_data);
             if (res && res.status === 200){
                 await dispatch('viewMe');
                 return true
@@ -70,12 +70,12 @@ export const usersModule = {
           }
       },
       async viewMe({commit}) {
-        const {data} = await axios.get('users/me/');
+        const {data} = await axios.get('users/me');
         await commit('setUser', data);
       },
       async updateProfile({}, form_data) {
           try {
-            const res = await axios.put('users/me/', form_data,
+            const res = await axios.put('users/me', form_data,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -92,7 +92,7 @@ export const usersModule = {
       },
       async getMyCompanyVacancies({commit}) {
           try {
-            const res = await axios.get('vacancies/me/');
+            const res = await axios.get('vacancies/me');
             if (res && res.status === 200) {
                 await commit('setCompanyVacancies', res.data);
             }
@@ -119,7 +119,7 @@ export const usersModule = {
 
       async logOut({commit}){
         try {
-            const res = await axios.delete('/auth/logout/');
+            const res = await axios.delete('/auth/logout');
             if (res && res.data.msg === "Successfully logout"){
                 const user = null
                 await commit('setUser', user);

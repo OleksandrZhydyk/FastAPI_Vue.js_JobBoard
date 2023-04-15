@@ -37,7 +37,7 @@ class Config:
     ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
     STATIC_ROOT = os.getenv("STATIC_ROOT", "static")
-    HOSTED_DOMAIN = os.getenv("HOSTED_DOMAIN", "http://localhost:8000")
+    ORIGIN = os.getenv("ORIGIN", "http://localhost:8000")
 
     USE_S3 = os.getenv('USE_S3')
     AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")

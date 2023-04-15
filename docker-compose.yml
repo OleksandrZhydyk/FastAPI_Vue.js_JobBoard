@@ -21,7 +21,6 @@ services:
     volumes:
       - ./frontend:/frontend
       - /frontend/node_modules
-
     expose:
       - 8080
 
@@ -48,7 +47,5 @@ services:
       depends_on:
         - backend
 
-
 volumes:
   pg_data: { }
-  pgadmin_data: { }
