@@ -19,16 +19,16 @@ const routes = [
     component: () => import('@/views/LoginView.vue')
   },
   {
-    path: '/users/profile/:id',
+    path: '/users/profile/:id(\\d+)',
     name: 'applicantProfile',
     component: () => import('@/views/ApplicantProfile.vue'),
-    meta: { requiresAuth: true },
+    meta: { isCompany: true },
   },
   {
     path: '/me/vacancies',
     name: 'companyVacancies',
     component: () => import('@/views/CompanyVacancies.vue'),
-    meta: { requiresAuth: true, isCompany: true },
+    meta: { isCompany: true },
   },
   {
     path: '/me',
@@ -46,30 +46,30 @@ const routes = [
     path: '/me/vacancies/archive',
     name: 'archivedVacancies',
     component: () => import('@/views/ArchivedVacancies.vue'),
-    meta: { requiresAuth: true, isCompany: true },
+    meta: { isCompany: true },
   },
   {
     path: '/vacancies/create',
     name: 'createVacancy',
     component: () => import('@/views/CreateVacancy.vue'),
-    meta: { requiresAuth: true, isCompany: true },
+    meta: { isCompany: true },
   },
   {
-    path: '/vacancies/:id',
+    path: '/vacancies/:id(\\d+)',
     name: 'vacancies',
     component: () => import('@/views/VacancyDetailView.vue')
   },
   {
-    path: '/vacancies/:id/update',
+    path: '/vacancies/:id(\\d+)/update',
     name: 'vacanciesUpdate',
     component: () => import('@/views/VacancyUpdate.vue'),
-    meta: { requiresAuth: true, isCompany: true },
+    meta: { isCompany: true },
   },
   {
-    path: '/vacancies/:id/appliers',
+    path: '/vacancies/:id(\\d+)/appliers',
     name: 'appliers',
     component: () => import('@/views/VacancyAppliers.vue'),
-    meta: { requiresAuth: true, isCompany: true },
+    meta: { isCompany: true },
   },
   {
     path: '/forbidden',
@@ -89,20 +89,24 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth && record.meta.isCompany)) {
-    if (store.getters['allUsers/isCompany']) {
-      next();
-      return;
-    }
-    next('/forbidden');
-  }
+  store.commit('allUsers/setErrors', null);
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (store.getters['allUsers/isAuthenticated']) {
       next();
       return;
     }
     next('/login');
-  } else {
+    return;
+  }
+  if (to.matched.some(record => record.meta.isCompany)) {
+    if (store.getters['allUsers/isCompany']) {
+      next();
+      return;
+    }
+    next('/forbidden');
+    return;
+  }
+ else {
     next();
   }
 });

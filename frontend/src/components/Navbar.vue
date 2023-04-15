@@ -18,7 +18,7 @@
 
         <router-link class="btn btn-outline-primary ms-2" v-if="isLoggedIn" @click="logOut" :to="{name: 'login'}">Logout</router-link>
         <router-link class="btn btn-outline-primary ms-2" :to="{name: 'login'}" v-if="!isLoggedIn" >Login</router-link>
-        <router-link class="btn btn-outline-success ms-2" :to="{name: 'register'}" v-if="!isLoggedIn" >SignIn</router-link>
+        <router-link class="btn btn-outline-success ms-2" :to="{name: 'register'}" v-if="!isLoggedIn" >SignUp</router-link>
       </div>
     </nav>
  </header>

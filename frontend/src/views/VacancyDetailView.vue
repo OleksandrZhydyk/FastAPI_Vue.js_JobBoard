@@ -81,7 +81,7 @@ export default {
         async applyJob(vacancyId, userId){
             try {
                 const res = await this.applyToVacancy(vacancyId, userId)
-                if (res === true){
+                if (res){
                     await this.addAppliedVacancy(this.vacancy)
                 } else {
                     this.modal = true,

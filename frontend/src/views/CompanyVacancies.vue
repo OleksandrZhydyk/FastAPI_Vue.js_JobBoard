@@ -48,8 +48,10 @@ export default {
 
         async removeJob(id){
             try {
-                await this.deleteVacancy(id)
-                await this.deleteMyVacancies(id);
+                const res = await this.deleteVacancy(id);
+                if (res){
+                    await this.deleteMyVacancies(id);
+                }
             } catch(e){
                 console.log(e);
             }

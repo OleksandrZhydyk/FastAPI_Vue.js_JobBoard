@@ -35,13 +35,14 @@
                 </div>
             </div>
         </div>
-        <modal-error @modal="getModal" v-if="modal" :updated="updated" :error="error" :modal="modal"/>
+        <modal-error @modal="getModal" v-if="modal" :updated="updated" :modal="modal"/>
     </form>
 </template>
 
 <script>
-import { mapActions, mapState, mapMutations } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import ModalError from '@/components/ModalError';
+import store from '@/store';
 
 export default {
     data() {
@@ -49,39 +50,44 @@ export default {
             vacancy: null,
             modal: false,
             updated: false,
-            error: false,
         }
     },
     components: {
         ModalError
     },
     methods: {
+        ...mapState({
+            errors: state => state.allUsers.errors
+        }),
         ...mapActions({
             updateVacancy: 'allVacancies/updateVacancy'
         }),
         getModal(event){
-            this.modal = false,
-            this.error = false,
-            this.updated = false,
+            this.modal = false
+            this.updated = false
             this.created = false
+            if (this.errors === null) {
+                this.$router.push('/me/vacancies');
+            } else {
+                store.commit('allUsers/setErrors', null);
+            }
         },
         async modifyVacancy(vacancy){
             try {
-            let data = {
-              "id": vacancy.id,
-              "email": vacancy.email,
-              "title": vacancy.title,
-              "description": vacancy.description,
-              "salary_from": vacancy.salary_from.toString(),
-              "salary_to": vacancy.salary_to.toString()
-            }
+                let data = {
+                  "id": vacancy.id,
+                  "email": vacancy.email,
+                  "title": vacancy.title,
+                  "description": vacancy.description,
+                  "salary_from": vacancy.salary_from.toString(),
+                  "salary_to": vacancy.salary_to.toString()
+                }
                 let res = await this.updateVacancy(data)
-                if (res === true){
-                    this.modal = true,
+                if (res){
+                    this.modal = true
                     this.updated = true
                 } else {
-                    this.modal = true,
-                    this.error = true
+                    this.modal = true
                 }
             } catch(e){
                 console.log(e);

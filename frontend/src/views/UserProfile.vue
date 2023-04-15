@@ -63,15 +63,16 @@
                         </div>
                     </div>
                 </div>
-                <modal-error @modal="getModal" v-if="modal" :updated="updated" :error="error" :modal="modal"/>
+                <modal-error @modal="getModal" v-if="modal" :updated="updated" :modal="modal"/>
             </form>
         </div>
     </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapMutations } from 'vuex';
 import ModalError from '@/components/ModalError';
+import store from '@/store';
 
 export default {
     name: "UserProfile",
@@ -89,7 +90,6 @@ export default {
             avatar: null,
             modal: false,
             updated: false,
-            error: false,
         }
     },
 
@@ -100,10 +100,10 @@ export default {
         viewMe: 'allUsers/viewMe',
     }),
     getModal(event){
-        this.modal = false,
-        this.error = false,
-        this.updated = false,
+        this.modal = false
+        this.updated = false
         this.created = false
+        store.commit('allUsers/setErrors', null);
     },
     handleResumeUpload(event){
         this.resume = event.target.files[0];
@@ -115,7 +115,6 @@ export default {
         this.name = event.target.value;
     },
     handleEmailUpload( event ){
-        console.log(event.target.value)
         this.email = event.target.value;
     },
 
@@ -132,22 +131,23 @@ export default {
       if (this.resume){
         form_data.append('resume', this.resume);
       }
-      let res = await this.updateProfile(form_data);
-      if (res === true){
-        this.modal = true,
-        this.updated = true
+      const res = await this.updateProfile(form_data);
+      if (res){
+        this.modal = true;
+        this.updated = true;
+        this.avatar = null;
+        this.resume = null;
+        this.clearAvatar = false;
+        this.clearResume = false;
+        if (this.email || this.password){
+          await this.logOut();
+          this.$router.push('/login');
+        } else {
+          await this.viewMe();
+          this.$router.push('/me');
+        }
       } else {
-        this.modal = true,
-        this.error = true
-      }
-      this.clearAvatar = false
-      this.clearResume = false
-      if (this.email || this.password){
-        await this.logOut();
-        this.$router.push('/login');
-      } else {
-        await this.viewMe();
-        this.$router.push('/me');
+        this.modal = true;
       }
     }
   },
@@ -155,7 +155,6 @@ export default {
       ...mapState({
           user: state => state.allUsers.user,
       }),
-
   },
 }
 

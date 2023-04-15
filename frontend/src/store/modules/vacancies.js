@@ -41,16 +41,18 @@ export const vacanciesModule = {
     actions: {
       async getVacancies({commit}, params) {
         try {
-            let {data} = await axios.get('vacancies/',
+            const {data} = await axios.get('vacancies/',
                 {
                     params: params,
                     paramsSerializer: {
                         indexes: null
                     },
                 });
-            commit('setVacancies', data);
-            commit('setAllPages', data.pages);
-            commit('setAllCategories', data.categories);
+            if (data){
+              commit('setVacancies', data);
+              commit('setAllPages', data.pages);
+              commit('setAllCategories', data.categories);
+            }
         } catch(e) {
             console.log(e)
         } finally {
@@ -58,42 +60,54 @@ export const vacanciesModule = {
         }
       },
       async getVacancy({commit}, id) {
-        let {data} = await axios.get(`vacancies/${id}`);
+        const {data} = await axios.get(`vacancies/${id}/`);
         commit('setVacancy', data);
       },
 
       async getVacancyAppliers({commit}, id) {
-        let {data} = await axios.get(`vacancies/${id}/apply`);
+        const {data} = await axios.get(`vacancies/${id}/apply/`);
         commit('setVacancyAppliers', data);
       },
       async createVacancy({}, payload) {
-        let res = await axios.post('vacancies/', payload);
-        if (res.status !== 200) {
-            return false
+        try{
+          const res = await axios.post('vacancies/', payload);
+          if (res && res.status === 200) {
+            return true
+          }
+        } catch(e) {
+          console.log(e)
         }
-        return true
       },
       async updateVacancy({}, data) {
-        const {id, ...params} = data
-        let res = await axios.put(`vacancies/${id}`, params);
-        if (res.status !== 200) {
-            return false
+        try{
+          const {id, ...params} = data
+          const res = await axios.put(`vacancies/${id}/`, params);
+          if (res && res.status === 200) {
+            return true
+          }
+        } catch(e) {
+          console.log(e)
         }
-        return true
       },
       async deleteVacancy({}, id) {
-        let res = await axios.delete(`vacancies/${id}`);
-        if (res.status !== 200) {
-            return false
+        try {
+          const res = await axios.delete(`vacancies/${id}/`);
+          if (res && res.status === 200) {
+            return true
+          }
+        } catch(e) {
+          console.log(e)
         }
-        return true
       },
       async applyToVacancy({}, vacancyId, userId) {
-        let res = await axios.post(`vacancies/${vacancyId}/apply`, userId);
-        if (res.status !== 200) {
-            return false
+        try {
+          const res = await axios.post(`vacancies/${vacancyId}/apply/`, userId);
+          if (res && res.status === 200) {
+              return true
+          }
+        } catch(e) {
+          console.log(e)
         }
-        return true
       },
     },
   namespaced: true,

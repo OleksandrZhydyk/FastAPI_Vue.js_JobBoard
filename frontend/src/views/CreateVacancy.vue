@@ -48,13 +48,14 @@
                 </div>
             </div>
         </div>
-        <modal-error @modal="getModal" v-if="modal" :created="created" :error="error" :modal="modal"/>
+        <modal-error @modal="getModal" v-if="modal" :created="created" :modal="modal"/>
     </form>
 </template>
 
 <script>
 import { mapActions, mapMutations, mapState, mapGetters } from 'vuex';
 import ModalError from '@/components/ModalError';
+import store from '@/store';
 
 export default {
     name: "CreateVacancy",
@@ -72,7 +73,6 @@ export default {
                 category: 'Miscellaneous',
             },
             modal: false,
-            error: false,
             created: false,
         }
     },
@@ -81,20 +81,23 @@ export default {
             createVacancy: 'allVacancies/createVacancy',
         }),
         getModal(event){
-            this.modal = false,
-            this.error = false,
-            this.updated = false,
+            this.modal = false
+            this.updated = false
             this.created = false
+            if (this.errors === null) {
+                this.$router.push('/me/vacancies');
+            } else {
+                store.commit('allUsers/setErrors', null);
+            }
         },
         async publishVacancy(vacancy){
             try {
                 const res = await this.createVacancy(vacancy)
-                if (res === true){
-                    this.modal = true,
+                if (res){
+                    this.modal = true
                     this.created = true
                 } else {
-                    this.modal = true,
-                    this.error = true
+                    this.modal = true
                 }
             } catch(e){
                 console.log(e);
@@ -104,7 +107,8 @@ export default {
     computed: {
         ...mapState({
             categories: state => state.allVacancies.categories,
-        })
+            errors: state => state.allUsers.errors
+        }),
     },
 }
 </script>

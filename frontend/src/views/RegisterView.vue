@@ -19,6 +19,11 @@
             <input type="checkbox" class="me-2" name="password-confirmation" v-model="isCompany"/>
             <label for="password" class="form-label">Employer Y/N?</label>
           </div>
+          <div v-if="errors" class="alert alert-danger" role="alert">
+          <ul v-for="error, index in errors" :key="index">
+            <li>{{error}}</li>
+            </ul>
+          </div>
           <button type="submit" class="btn btn-primary float-end">Submit</button>
         </form>
         </div>
@@ -27,7 +32,7 @@
 
 <script>
 // @ is an alias to /src
-import { mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
   name: 'RegisterView',
@@ -37,9 +42,18 @@ export default {
         password:'',
         passwordConfirmation: '',
         isCompany: false,
+
     }
   },
+  computed: {
+    ...mapState({
+        errors: state => state.allUsers.errors,
+    }),
+  },
   methods: {
+    ...mapMutations({
+        setErrors: 'allUsers/setErrors',
+    }),
     ...mapActions({
         createUser: 'allUsers/createUser',
     }),
@@ -51,9 +65,12 @@ export default {
         is_company: this.isCompany,
       };
 
-      await this.createUser(payload);
-      this.$router.push('/login');
+      const res = await this.createUser(payload);
+      if (res) {
+        this.setErrors(null);
+        this.$router.push('/login');
       }
+    }
   },
 }
 </script>

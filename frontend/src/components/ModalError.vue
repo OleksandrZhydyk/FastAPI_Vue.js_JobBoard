@@ -6,7 +6,11 @@
       <div class="modal-body">
         <p v-if="updated" class="text-center fs-3">Vacancy updated successfully</p>
         <p v-if="created" class="text-center fs-3">Vacancy created successfully</p>
-        <p v-if="error" class="text-center fs-3">Error occurred</p>
+        <div v-if="errors" class="alert alert-danger" role="alert">
+          <ul v-for="error, index in errors" :key="index">
+            <li>{{error}}</li>
+          </ul>
+      </div>
       </div>
       <div class="modal-footer">
         <button type="button" @click='$emit("modal")' class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -18,7 +22,9 @@
 </template>
 
 <script>
+import { mapActions, mapState, mapMutations } from 'vuex';
 export default{
+
     props: {
         created: {
             type: Boolean,
@@ -28,15 +34,16 @@ export default{
             type: Boolean,
             value: false,
         },
-        error: {
-            type: Boolean,
-            value: false,
-        },
         modal: {
             type: Boolean,
             value: false,
         }
     },
+    computed: {
+    ...mapState({
+        errors: state => state.allUsers.errors,
+    }),
+  },
 }
 
 </script>

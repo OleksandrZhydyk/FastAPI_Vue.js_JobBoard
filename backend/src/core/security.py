@@ -14,11 +14,6 @@ from db.base import get_session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# oauth2_scheme = OAuth2PasswordBearer(
-#     tokenUrl="/auth/login",
-#     scheme_name="JWT"
-# )
-
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)

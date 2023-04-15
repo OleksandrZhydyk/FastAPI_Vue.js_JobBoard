@@ -11,6 +11,11 @@
         <label for="password" class="form-label">Password</label>
         <input type="password" name="password" v-model="form.password" class="form-control" required="true"/>
       </div>
+      <div v-if="errors" class="alert alert-danger" role="alert">
+          <ul v-for="error, index in errors" :key="index">
+            <li>{{error}}</li>
+          </ul>
+      </div>
       <button type="submit" class="btn btn-primary float-end">Login</button>
     </form>
     </div>
@@ -19,31 +24,45 @@
 
 <script>
 // @ is an alias to /src
-import { mapActions } from 'vuex';
+import { mapActions, mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'LoginView',
   components: {},
   data() {
     return {
+      error: false,
       form: {
         username: '',
         password:'',
       }
-    };
+    }
+  },
+  computed: {
+    ...mapState({
+        errors: state => state.allUsers.errors,
+    }),
   },
   methods: {
     ...mapActions({
         logIn: 'allUsers/logIn',
+    }),
+    ...mapMutations({
+        setErrors: 'allUsers/setErrors',
     }),
 
       async submit() {
           const form_data = new FormData();
           form_data.append('username', this.form.username);
           form_data.append('password', this.form.password);
-          await this.logIn(form_data);
-          this.$router.push('/');
+          const res = await this.logIn(form_data);
+          if (res){
+            this.setErrors(null)
+            this.$router.push('/');
+          } else {
+            this.error = true
           }
-    },
+      }
+  },
 }
 </script>
