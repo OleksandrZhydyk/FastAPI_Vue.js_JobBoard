@@ -88,8 +88,8 @@ class UsersService:
                 detail=f"Database error: {err}",
             )
         # print(db_obj.scalar_one().__dict__)
-        a = db_obj.scalar_one()
-        print(type(a))
+        a = db_obj.one()
+        print(a.__dict__)
         return a
 
     async def get_all(self, db: AsyncSession) -> List[UserOut]:
