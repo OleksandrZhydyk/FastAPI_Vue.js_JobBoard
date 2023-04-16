@@ -88,7 +88,7 @@ class UsersService:
                 detail=f"Database error: {err}",
             )
         a = db_obj.scalar()
-        # return a
+        print(a != 1)
         return UserOut(id=a.id , is_company=a.is_company, is_active=a.is_active, is_superuser=a.is_superuser, created_at=a.created_at, updated_at=a.updated_at, avatar=a.avatar, resume=a.resume, name=a.name, email=a.email)
 
     async def get_all(self, db: AsyncSession) -> List[UserOut]:
