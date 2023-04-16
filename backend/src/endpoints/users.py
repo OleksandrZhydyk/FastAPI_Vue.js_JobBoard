@@ -92,7 +92,7 @@ async def update_user(
     user_service: UsersService = Depends(get_users_service),
     current_user: UserInDB = Depends(check_superuser_credentials),
     db: AsyncSession = Depends(get_session),
-) -> UserOut:
+):
     try:
         user_update_data = UserUpdateSuperuser(
             email=email, name=name, password=password,

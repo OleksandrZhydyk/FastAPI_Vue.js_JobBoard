@@ -1,5 +1,5 @@
 <template>
- <header>
+  <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light" >
       <div class="container">
         <a class="navbar-brand" href="#" @click="$router.push('/')">Job Board</a>
@@ -21,28 +21,28 @@
         <router-link class="btn btn-outline-success ms-2" :to="{name: 'register'}" v-if="!isLoggedIn" >SignUp</router-link>
       </div>
     </nav>
- </header>
+  </header>
 </template>
 
 <script>
-import {mapState, mapGetters, mapActions, mapMutations} from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'NavBar',
 
   computed: {
     ...mapGetters({
-        isLoggedIn: 'allUsers/isAuthenticated',
-        isCompany: 'allUsers/isCompany',
+      isLoggedIn: 'allUsers/isAuthenticated',
+      isCompany: 'allUsers/isCompany'
     }),
     ...mapState({
-        user: state => state.allUsers.user,
+      user: state => state.allUsers.user
     }),
   },
   methods: {
     ...mapActions({
-        logOut: 'allUsers/logOut'
+      logOut: 'allUsers/logOut'
     })
-  },
+  }
 }
 </script>

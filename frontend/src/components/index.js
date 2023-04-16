@@ -5,8 +5,8 @@ import ModalError from "@/components/ModalError";
 
 
 export default [
-    Navbar,
-    JobsList,
-    DialogLogin,
-    ModalError,
+  Navbar,
+  JobsList,
+  DialogLogin,
+  ModalError
 ]

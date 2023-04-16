@@ -37,4 +37,4 @@ async def upload_file(sub_path: str, file: UploadFile):
             print(e)
             return None
 
-        return f'{Config.HOST}/{path_for_saving}'
+        return f'{Config.ORIGIN}/{path_for_saving}'
