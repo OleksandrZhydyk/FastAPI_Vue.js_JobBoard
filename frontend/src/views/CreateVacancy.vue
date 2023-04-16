@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState, mapGetters } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import ModalError from '@/components/ModalError';
 import store from '@/store';
 

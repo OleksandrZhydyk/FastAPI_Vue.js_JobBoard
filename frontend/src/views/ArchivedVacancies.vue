@@ -24,16 +24,26 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
     name: "archivedVacancies",
+    methods: {
+        ...mapActions({
+            getMyCompanyVacancies: 'allUsers/getMyCompanyVacancies',
+        }),
+    },
     computed: {
         ...mapState({
             companyVacancies: state => state.allUsers.companyVacancies,
         }),
         archivedVacancies(){
             return [...this.companyVacancies].filter((vacancy) => !vacancy.is_active)
+        }
+    },
+    created() {
+        if (this.companyVacancies.length === 0){
+            this.getMyCompanyVacancies()
         }
     },
 }

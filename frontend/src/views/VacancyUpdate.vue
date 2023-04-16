@@ -55,10 +55,12 @@ export default {
     components: {
         ModalError
     },
-    methods: {
+    computed: {
         ...mapState({
             errors: state => state.allUsers.errors
         }),
+    },
+    methods: {
         ...mapActions({
             updateVacancy: 'allVacancies/updateVacancy'
         }),

@@ -71,7 +71,7 @@ async def test_update_user_duplicate(superuser_client, create_user, create_compa
                 "detail": [
                     {
                         "loc": ["body", "confirmed_password"],
-                        "msg": "Please enter the same value for password and confirmed password field",
+                        "msg": "Please enter the same value for password and confirmation password field",
                         "type": "value_error",
                     }
                 ]

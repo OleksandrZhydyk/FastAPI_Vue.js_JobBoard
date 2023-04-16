@@ -7,6 +7,8 @@
                         <div v-if="user.avatar" class="d-flex flex-column align-items-center text-center p-3 py-5 mt-3"><img
                             class="rounded-circle"
                             :src="user.avatar"
+                            width="300"
+                            height="300"
                             alt="avatar">
 
                             <input @change="handleAvatarUpload($event)" type="file" name="avatar" class="form-control mt-2" accept="image/*" id="id_avatar">
@@ -45,8 +47,8 @@
                                         <img class="d-block float-end" src="media/default_imgs/pdf_download.png" style="width:75px;height:75px;">
                                     </a>
                                 </div>
-                                <div v-if="user.resume" class="col-md-6">
-                                    <input @change="handleResumeUpload($event)" type="file" name="resume" class="form-control mt-3" accept="image/*" id="id_file">
+                                <div class="col-md-6">
+                                    <input @change="handleResumeUpload($event)" type="file" name="resume" class="form-control mt-3" accept=".pdf" id="id_file">
                                     <input v-model="clearResume" class="me-2" type="checkbox" name="file-clear" id="file-clear_id">
                                             <label for="file-clear_id">Delete resume</label>
                                 </div>
@@ -56,7 +58,7 @@
                                    <img class="d-block float-end" src="media/default_imgs/gray_pdf.png" style="width:75px;height:75px;">
                                 </div>
                                 <div class="col-md-6">
-                                    <input @change="handleResumeUpload($event)" type="file" name="resume" class="form-control mt-3" accept="image/*" id="id_file">
+                                    <input @change="handleResumeUpload($event)" type="file" name="resume" class="form-control mt-3" accept=".pdf" id="id_file">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-warning float-end mt-5">Update</button>
@@ -106,10 +108,18 @@ export default {
         store.commit('allUsers/setErrors', null);
     },
     handleResumeUpload(event){
-        this.resume = event.target.files[0];
+        if (event.target.files.length && event.target.files[0].type === "application/pdf"){
+            this.resume = event.target.files[0];
+        } else {
+            store.commit('allUsers/setErrors', 'Unsupported file type! Please choose file with .pdf extension');
+        }
     },
     handleAvatarUpload(event){
-        this.avatar = event.target.files[0];
+        if (event.target.files.length && event.target.files[0].type.split('/')[0] === "image"){
+            this.avatar = event.target.files[0];
+        } else {
+            store.commit('allUsers/setErrors', 'Unsupported file type! Please choose image');
+        }
     },
     handleNameUpload( event ){
         this.name = event.target.value;
@@ -131,29 +141,35 @@ export default {
       if (this.resume){
         form_data.append('resume', this.resume);
       }
-      const res = await this.updateProfile(form_data);
-      if (res){
-        this.modal = true;
-        this.updated = true;
-        this.avatar = null;
-        this.resume = null;
-        this.clearAvatar = false;
-        this.clearResume = false;
-        if (this.email || this.password){
-          await this.logOut();
-          this.$router.push('/login');
-        } else {
-          await this.viewMe();
-          this.$router.push('/me');
-        }
-      } else {
-        this.modal = true;
-      }
+
+      if (this.errors){
+          this.modal = true;
+       } else {
+         const res = await this.updateProfile(form_data);
+          if (res){
+            this.modal = true;
+            this.updated = true;
+            this.avatar = null;
+            this.resume = null;
+            this.clearAvatar = false;
+            this.clearResume = false;
+            if (this.email || this.password){
+              await this.logOut();
+              this.$router.push('/login');
+            } else {
+              await this.viewMe();
+              this.$router.push('/me');
+            }
+          } else {
+            this.modal = true;
+          }
+       }
     }
   },
   computed: {
       ...mapState({
           user: state => state.allUsers.user,
+          errors: state => state.allUsers.errors
       }),
   },
 }

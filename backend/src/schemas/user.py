@@ -61,7 +61,7 @@ class UserCreate(UserBase):
     def match_passwords(cls, password, values, **kwargs):
         if "password" in values and values["password"] != password:
             raise ValueError(
-                "Please enter the same value for password and confirmed password field"
+                "Please enter the same value for password and confirmation password field"
             )
         return password
 

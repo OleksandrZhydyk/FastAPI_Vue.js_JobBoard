@@ -43,7 +43,7 @@ export const usersModule = {
             if (Array.isArray(errors)){
                 let msg = []
                 for (let i=0; i<errors.length; i++){
-                    msg.push(errors[i].msg)
+                    msg.push(errors[i].loc[1] +": " + errors[i].msg)
                 }
                 state.errors = msg;
             } else if (errors === null){

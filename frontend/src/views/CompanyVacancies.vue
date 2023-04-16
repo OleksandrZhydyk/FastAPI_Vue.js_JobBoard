@@ -68,7 +68,9 @@ export default {
         }
     },
     created() {
-        this.getMyCompanyVacancies()
+        if (this.companyVacancies.length === 0){
+            this.getMyCompanyVacancies()
+        }
     },
 
 }

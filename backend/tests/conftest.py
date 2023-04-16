@@ -4,22 +4,21 @@ import os
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.dialects.postgresql import insert
 
-os.environ["TESTING"] = "True"
+os.environ["TESTING"] = "True"  # Env variable for switching to test db connection
 
-import alembic
 import pytest
 import pytest_asyncio
-from alembic.config import Config
 from fastapi import FastAPI
 from httpx import AsyncClient
 
 from db.models.jobs import Job
-from db.base import async_session
+from db.base import async_session, engine, Base
 from schemas.user import UserOut
 from core.security import hash_password
 from db.models.users import User, association_table
 
 
+# Open event loop for async test session
 @pytest.fixture(autouse=True, scope="session")
 def event_loop():
     loop = asyncio.new_event_loop()
@@ -35,16 +34,14 @@ def app() -> FastAPI:
     return app
 
 
+# Creation and drop tables for each test (isolation)
 @pytest_asyncio.fixture(autouse=True)
-def db_models():
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.create_all)
-    config = Config("alembic.ini")
-    alembic.command.upgrade(config, "head")
+async def db_models():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.drop_all)
-    alembic.command.downgrade(config, "base")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture
