@@ -89,7 +89,7 @@ class UsersService:
             )
         # print(db_obj.scalar_one().__dict__)
         a = db_obj.one()
-        print(a.__dict__)
+        # print(a.__dict__)
         return a
 
     async def get_all(self, db: AsyncSession) -> List[UserOut]:
