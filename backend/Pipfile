@@ -25,14 +25,14 @@ anyio = {extras = ["trio"], version = "*"}
 pytest-asyncio = "*"
 typer = "*"
 fastapi-pagination = "*"
-flake8 = "*"
-black = "*"
 fastapi-jwt-auth = "*"
 aiofiles = "*"
 boto3 = "*"
 aioboto3 = "==10.4.0"
 
 [dev-packages]
+flake8 = "*"
+black = "*"
 
 [requires]
 python_version = "3.10"
