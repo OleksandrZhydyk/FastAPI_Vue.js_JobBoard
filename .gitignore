@@ -3,6 +3,5 @@ test_main.http
 __pycache__
 .env
 .pytest_cache
-Pipfile.lock
 .gitignore
 static
