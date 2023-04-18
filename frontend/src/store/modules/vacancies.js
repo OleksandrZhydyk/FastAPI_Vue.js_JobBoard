@@ -7,9 +7,9 @@ export const vacanciesModule = {
       vacanciesLoadingIndicator: false,
       vacancy: null,
       vacancyAppliers: null,
-      allPages: 0,
+      allPages: 5,
       categories: null,
-      objOnPage: 5
+      objOnPage: 1
      }
   ),
   getters: {
@@ -31,7 +31,11 @@ export const vacanciesModule = {
       state.vacancyAppliers = appliers
     },
     setAllPages(state, pages){
-      state.allPages = pages;
+      if (pages === 0){
+        state.allPages = 1
+      } else {
+        state.allPages = pages;
+      }
     },
     setAllCategories(state, categories){
       state.categories = categories;

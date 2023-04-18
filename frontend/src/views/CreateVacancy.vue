@@ -79,6 +79,7 @@ export default {
   methods: {
     ...mapActions({
       createVacancy: 'allVacancies/createVacancy',
+      getMyCompanyVacancies: 'allUsers/getMyCompanyVacancies'
     }),
     getModal(event){
       this.modal = false
@@ -94,6 +95,7 @@ export default {
       try {
         const res = await this.createVacancy(vacancy)
         if (res){
+          await this.getMyCompanyVacancies()
           this.modal = true
           this.created = true
         } else {

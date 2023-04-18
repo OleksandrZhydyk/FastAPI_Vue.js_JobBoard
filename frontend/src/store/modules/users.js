@@ -28,9 +28,6 @@ export const usersModule = {
     setMyVacanciesLoadingIndicator(state, bool) {
       state.myVacanciesLoadingIndicator = bool;
     },
-    deleteMyVacancies(state, id) {
-      state.companyVacancies = state.companyVacancies.filter(item => item.id !== id )
-    },
     addAppliedVacancy(state, vacancy){
       state.user.vacancies.push(vacancy)
     },

@@ -15,7 +15,8 @@
       <div class="row">
         <div class="col">
           <div v-if="loadingIndicator">
-            <jobs-list :vacancies="sortedVacancies"/>
+            <jobs-list v-if="sortedVacancies.length" :vacancies="sortedVacancies"/>
+            <div v-else class="fs-4 mt-5 mb-5 ms-3">No vacancies</div>
             <div class="row mt-2">
               <div class="col d-flex align-items-center">
                 <button class="btn btn-primary me-2" @click='pageDecr' :disabled="currentPage === 1">&lt&lt; Previous</button>

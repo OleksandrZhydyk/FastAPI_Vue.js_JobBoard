@@ -41,14 +41,11 @@ export default {
       getMyCompanyVacancies: 'allUsers/getMyCompanyVacancies',
       deleteVacancy: 'allVacancies/deleteVacancy'
     }),
-    ...mapMutations({
-      deleteMyVacancies: 'allUsers/deleteMyVacancies',
-    }),
     async removeJob(id){
       try {
         const res = await this.deleteVacancy(id);
           if (res){
-            await this.deleteMyVacancies(id);
+            await this.getMyCompanyVacancies();
           }
       } catch(e){
         console.log(e);

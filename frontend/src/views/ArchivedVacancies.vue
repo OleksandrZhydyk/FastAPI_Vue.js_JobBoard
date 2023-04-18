@@ -10,7 +10,7 @@
         <div class="card mt-3">
           <div class="card-header">
             <span>{{vacancy.title}}</span>
-            <span class="float-end">Updated: {{vacancy.updated_at.substring(0, 10)}}</span>
+            <span class="float-end">Closed: {{vacancy.updated_at.substring(0, 10)}}</span>
           </div>
           <div class="card-body">
             <p class="card-text">{{vacancy.category}}</p>

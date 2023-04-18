@@ -115,7 +115,7 @@ class JobsService:
     async def delete(self, pk: int, db: AsyncSession, user_db: UserOut):
         job = await self.get_one(pk, db)
         if job.user_id == user_db.id or user_db.is_superuser:
-            query = update(self.model).where(self.model.id == pk).values(is_active=False)
+            query = update(self.model).where(self.model.id == pk).values(is_active=False, updated_at=datetime.utcnow())
             await db.execute(query)
             try:
                 await db.commit()
