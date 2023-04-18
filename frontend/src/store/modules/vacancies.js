@@ -2,7 +2,8 @@ import axios from 'axios';
 
 export const vacanciesModule = {
   state: () => (
-    { vacancies: {},
+    {
+      vacancies: {},
       vacanciesLoadingIndicator: false,
       vacancy: null,
       vacancyAppliers: null,

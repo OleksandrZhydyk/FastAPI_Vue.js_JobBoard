@@ -2,7 +2,8 @@ import axios from 'axios';
 
 export const usersModule = {
   state: () => (
-    { user: null,
+    {
+      user: null,
       companyVacancies: [],
       myVacanciesLoadingIndicator: false,
       applicant: null,

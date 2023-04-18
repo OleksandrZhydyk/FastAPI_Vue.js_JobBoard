@@ -1,4 +1,5 @@
 import "bootstrap/dist/css/bootstrap.css"
+import "bootstrap/dist/js/bootstrap.js"
 import { createApp } from 'vue'
 import App from './App.vue'
 import axios from 'axios';
@@ -7,13 +8,18 @@ import router from '@/router';
 import store from '@/store';
 
 
-const app = createApp(App).use(router)
+const app = createApp(App).use(router);
 
-import "bootstrap/dist/js/bootstrap.js"
+components.forEach(component => {
+    app.component(component.name, component)
+})
+
+app.use(store);
+app.mount('#app');
 
 axios.defaults.withCredentials = true;
-
 axios.defaults.baseURL = process.env.VUE_APP_BACKEND;
+
 axios.interceptors.response.use( resp => resp, async error => {
   if (error.response.status === 422 && error.response.data.detail === "Signature has expired" && !store.state.allUsers.refreshExpired){
     store.commit('allUsers/setRefreshExpired', true)
@@ -33,11 +39,3 @@ axios.interceptors.response.use( resp => resp, async error => {
     store.commit('allUsers/setErrors', error.response.data.detail)
   }
 })
-
-components.forEach(component => {
-    app.component(component.name, component)
-})
-
-app.use(router);
-app.use(store);
-app.mount('#app');

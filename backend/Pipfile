@@ -15,20 +15,19 @@ bcrypt = "*"
 alembic = "*"
 asyncpg = "*"
 config = "*"
-python-jose = {extras = ["cryptography"], version = "*"}
 python-multipart = "*"
 pytest = "*"
 httpx = "*"
 sqlalchemy-utils = "*"
 asgi-lifespan = "*"
-anyio = {extras = ["trio"], version = "*"}
 pytest-asyncio = "*"
 typer = "*"
 fastapi-pagination = "*"
 fastapi-jwt-auth = "*"
 aiofiles = "*"
-boto3 = "*"
 aioboto3 = "==10.4.0"
+anyio = "*"
+boto3 = "*"
 
 [dev-packages]
 flake8 = "*"

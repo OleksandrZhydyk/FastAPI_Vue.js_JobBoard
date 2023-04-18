@@ -57,7 +57,7 @@
           </div>
         </div>
       </div>
-      <div v-else> No applicants </div>
+      <div v-else class="fs-4 mb-5 ms-3"> No applicants </div>
     </div>
   </div>
 </template>

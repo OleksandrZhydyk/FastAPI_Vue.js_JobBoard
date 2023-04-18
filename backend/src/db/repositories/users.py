@@ -87,8 +87,6 @@ class UsersService:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail=f"Database error: {err}",
             )
-        # a = db_obj.scalar()
-        # raise NameError(a)
         return db_obj.scalar_one()
 
     async def get_all(self, db: AsyncSession) -> List[UserOut]:
