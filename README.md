@@ -98,7 +98,7 @@ docker compose up -d --build
 - [x] Integration async tests (Pytest)
 - [x] Add CI (GitHub Actions)
 - [x] Add docker compose support
-- [x] Make Vue.js, Vuex, Vue Router
+- [x] Add Vue.js frontend
 - [x] S3 bucket for media files
 - [x] Nginx support
 
@@ -106,6 +106,8 @@ docker compose up -d --build
 ![Screenshot from 2023-04-16 11-05-02](https://user-images.githubusercontent.com/108074767/232284619-60cd9383-0106-4686-a247-142c1746fb6e.png)
 
 ![Screenshot from 2023-04-16 10-57-56](https://user-images.githubusercontent.com/108074767/232284775-ba8cccfb-82c0-4222-9af2-691d3d9a02fc.png)
+
+![Screenshot from 2023-04-18 22-49-38](https://user-images.githubusercontent.com/108074767/232889609-ef3ba70d-ff5c-452f-b652-0e9e794ed685.png)
 
 ![Screenshot from 2023-04-16 10-58-26](https://user-images.githubusercontent.com/108074767/232284996-6a42b9d5-38b9-44f7-8626-4c04616086a8.png)
 

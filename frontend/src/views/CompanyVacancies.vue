@@ -25,8 +25,8 @@
           </div>
         </div>
       </div>
-      <div v-else class="fs-4 mb-5 ms-3"> Loading ... </div>
-      <div v-if="activeVacancies.length === 0" class="fs-4 mb-5 ms-3"> No vacancies </div>
+      <div v-else class="fs-4 mt-5 mb-5 ms-3"> Loading ... </div>
+      <div v-if="activeVacancies.length === 0" class="fs-4 mt-5 mb-5 ms-3"> No vacancies </div>
     </div>
   </div>
 </template>

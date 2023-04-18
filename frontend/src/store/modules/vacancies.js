@@ -7,9 +7,9 @@ export const vacanciesModule = {
       vacanciesLoadingIndicator: false,
       vacancy: null,
       vacancyAppliers: null,
-      allPages: 5,
+      allPages: 1,
       categories: null,
-      objOnPage: 1
+      objOnPage: 5
      }
   ),
   getters: {

@@ -19,7 +19,8 @@
           </div>
         </div>
       </div>
-      <div v-else> Loading ... </div>
+      <div v-if="archivedVacancies.length === 0" class="fs-4 mt-5 mb-5 ms-3"> No archived vacancies </div>
+      <div v-else class="fs-4 mt-5 mb-5 ms-3"> Loading ... </div>
     </div>
   </div>
 </template>
