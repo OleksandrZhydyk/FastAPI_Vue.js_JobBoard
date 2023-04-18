@@ -1,4 +1,4 @@
-# FastAPI Job Board
+# FastAPI Vue.js Job Board
 
 Job board application powered by FastAPI. 
 The main goal of this is to learn FastAPI, Vue 
@@ -37,7 +37,7 @@ The app features:
 
 1. Clone the repo:
 ```sh
-https://github.com/OleksandrZhydyk/FastApiPractic_JobBoard.git
+https://github.com/OleksandrZhydyk/FastAPI_Vue.js_JobBoard.git
 ```
 
 ## Usage
