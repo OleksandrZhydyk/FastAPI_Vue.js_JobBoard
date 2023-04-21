@@ -11,7 +11,7 @@ services:
     volumes:
       - ./backend:/backend
     env_file:
-      - ./backend/.env
+      - .env
     depends_on:
       - postgres
 
@@ -23,6 +23,8 @@ services:
     volumes:
       - ./frontend:/frontend
       - /frontend/node_modules
+    env_file:
+      - .env
     expose:
       - 8080
 
@@ -32,7 +34,7 @@ services:
     expose:
       - 5432
     env_file:
-      - ./backend/.env
+      - .env
     volumes:
       - pg_data:/var/lib/postgresql/data
 
@@ -43,9 +45,11 @@ services:
       ports:
         - 80:80
         - 443:443
-      command: /bin/bash -c "envsubst < /etc/nginx/conf.d/fastapi.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+      command:
+        /bin/bash -c "envsubst < /etc/nginx/conf.d/fastapi.conf.template > 
+        /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
       env_file:
-        - ./backend/.env
+        - .env
       depends_on:
         - backend
 

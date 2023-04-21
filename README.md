@@ -44,13 +44,14 @@ https://github.com/OleksandrZhydyk/FastAPI_Vue.js_JobBoard.git
 
 For running the app you need:
 
-1. Add app configuration to your .env files in the root of the services:
-* backend .env
+1. Add app configuration to your .env file in the root:
+
 ```sh
 #Block FastAPI settings
 HOST_NAME=YOUR_HOST_NAME
 WSGI_PORT=YOUR_WSGI_PORT
 ROOT_PATH=YOUR_FASTAPI_ROOT_PATH
+VUE_APP_BACKEND=http://${YOUR_HOST_NAME}${YOUR_FASTAPI_ROOT_PATH}
 SECRET_KEY=YOUR_SECRET_KEY
 ALGORITHM=ALGORITHM_FOR_JWT
 ACCESS_TOKEN_EXPIRE_SECONDS=SECONDS
@@ -78,18 +79,14 @@ LOCAL_ORIGIN = YOUR_ORIGIN
 USE_S3='True'-FOR_S3_MEDIA_SAVING, ''-FOR_SYSTEM_SAVING
 ```
 
-* frontend .env
-```sh
-#Base url for axios
-VUE_APP_BACKEND=YOUR_HOST+YOUR_ROOT_PATH
-```
-
 2. Run the command for building and running the images in prod mode:
 ```sh
 docker compose up -d --build
 ```
 > For running in dev mode use docker-compose-dev.yml. 
-
+```sh
+docker compose -f docker-compose-dev.yml up --build -d
+```
 
 ## TODO
 - [x] Integrate Alembic migrations
