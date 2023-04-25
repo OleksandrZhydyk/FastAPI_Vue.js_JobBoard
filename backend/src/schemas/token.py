@@ -1,6 +1,4 @@
-from typing import List
-
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 class Login(BaseModel):
@@ -12,17 +10,5 @@ class Status(BaseModel):
     message: bool
 
 
-class Token(BaseModel):
+class AccessToken(BaseModel):
     access_token: str
-    refresh_token: str
-    token_type: str
-    # user: IUserRead
-
-
-class TokenRead(BaseModel):
-    email: EmailStr
-    scopes: List[str] = []
-
-
-class RefreshToken(BaseModel):
-    refresh_token: str

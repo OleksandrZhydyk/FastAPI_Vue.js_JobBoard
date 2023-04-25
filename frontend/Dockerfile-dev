@@ -5,7 +5,6 @@ RUN mkdir "frontend"
 WORKDIR /frontend
 
 ENV PATH /frontend/node_modules/.bin:$PATH
-ENV VUE_APP_BACKEND=${LOCAL_ORIGIN}
 RUN npm install @vue/cli@5.0.8 -g
 
 COPY package.json .

@@ -4,7 +4,7 @@ RUN mkdir "frontend"
 WORKDIR /frontend
 
 ENV PATH /frontend/node_modules/.bin:$PATH
-COPY package.json /app/package.json
+COPY package.json /package.json
 
 RUN npm install --silent
 RUN npm install @vue/cli@3.7.0 -g
